@@ -1,4 +1,4 @@
-/* BugSense front-end: a small single-page app in plain JavaScript (no framework).
+/* NirBug front-end: a small single-page app in plain JavaScript (no framework).
    - Talks to the Flask REST API with fetch() + Bearer token
    - Every value coming from the server is HTML-escaped (esc) to prevent XSS
 */

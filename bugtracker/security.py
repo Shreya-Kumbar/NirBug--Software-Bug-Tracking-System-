@@ -54,7 +54,7 @@ class TokenManager:
     """Issues and verifies tamper-proof tokens containing the user id and role."""
 
     def __init__(self, secret_key: str):
-        self._s = URLSafeTimedSerializer(secret_key, salt="bugsense-auth")
+        self._s = URLSafeTimedSerializer(secret_key, salt="nirbug-auth")
 
     def issue(self, user_id: int, role: str) -> str:
         return self._s.dumps({"uid": user_id, "role": role})

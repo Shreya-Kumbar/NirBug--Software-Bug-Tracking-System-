@@ -1,4 +1,4 @@
-# BugSense – AI-Assisted Software Bug Tracking & Issue Management System
+# NirBug – AI-Assisted Software Bug Tracking & Issue Management System
 
 Software Engineering group project. A full-stack web app for bug reporting, severity classification,
 developer assignment, version tracking, testing status and release management.
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 python -m bugtracker.app
 ```
 Open http://127.0.0.1:5000 — demo accounts `admin`, `manager`, `dev_alice`, `dev_bob`, `dev_chen`, `tester`,
-`reporter`, all with password `Demo@1234`. Delete `bugsense.db` to reset the demo data.
+`reporter`, all with password `Demo@1234`. Delete `nirbug.db` to reset the demo data.
 
 ## Test
 ```bash
@@ -28,8 +28,8 @@ python -m pytest -v        # 63 unit, integration and system tests
 ## Documents
 ```bash
 python docs/generate_diagrams.py   # UML diagrams -> docs/diagrams/
-python docs/build_report.py        # docs/BugSense_Project_Report.docx
-python docs/build_ppt.py           # docs/BugSense_Presentation.pptx
+python docs/build_report.py        # docs/NirBug_Project_Report.docx
+python docs/build_ppt.py           # docs/NirBug_Presentation.pptx
 ```
 
 ## Structure

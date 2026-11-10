@@ -62,9 +62,9 @@ def usecase(ax, x, y, text, w=24, h=6):
 
 # ------------------------------------------------------------------ 1. USE CASE
 def use_case():
-    fig, ax = canvas(13, 10, "Use Case Diagram – BugSense")
+    fig, ax = canvas(13, 10, "Use Case Diagram – NirBug")
     ax.add_patch(FancyBboxPatch((25, 3), 80, 92, boxstyle="round,pad=0,rounding_size=2", fc="#fafafa", ec=INK))
-    ax.text(65, 92, "BugSense System", ha="center", fontweight="bold", fontsize=11)
+    ax.text(65, 92, "NirBug System", ha="center", fontweight="bold", fontsize=11)
     ucs = {
         "login": (45, 85, "Login / Logout"), "register": (85, 85, "Register (self sign-up)"),
         "report": (45, 76, "Report Bug"),
@@ -353,7 +353,7 @@ def deployment():
     ax.text(81, 50, "«server» Application Server (Python 3.11)", ha="center", fontweight="bold")
     box(ax, 50, 30, 28, 14, "Gunicorn / Flask\nREST API", GREEN)
     box(ax, 84, 30, 28, 14, "BugIntelligence\n(scikit-learn model)", ORANGE)
-    box(ax, 66, 13, 28, 12, "SQLite DB file\n(bugsense.db)", PURPLE)
+    box(ax, 66, 13, 28, 12, "SQLite DB file\n(nirbug.db)", PURPLE)
     arrow(ax, (32, 30), (50, 37), "HTTPS / JSON (TLS)", style="<|-|>")
     arrow(ax, (78, 37), (84, 37), "", style="<|-|>")
     arrow(ax, (64, 30), (76, 25), "SQL", style="<|-|>")
@@ -364,13 +364,13 @@ def deployment():
 def gantt():
     # Project window: 31 Oct 2026 (day 0) -> 15 Nov 2026 (day 15) = 16 days.
     # (task, start day, duration in days, owner)
-    tasks = [("Requirement gathering & SRS", 0, 3, "Both"), ("Use-case & domain modelling", 2, 2, "Member 1"),
-             ("Architecture & DB design", 3, 2, "Member 2"), ("UML diagrams", 4, 3, "Member 1"),
-             ("Backend: DB + repositories", 5, 3, "Member 2"), ("Backend: services + security", 7, 3, "Member 2"),
-             ("AI module (ML)", 7, 3, "Member 1"), ("Frontend (web UI)", 8, 4, "Member 1"),
-             ("Unit + integration tests", 10, 3, "Member 2"), ("System testing & bug fixing", 12, 2, "Both"),
+    tasks = [("Requirement gathering & SRS", 0, 3, "Both"), ("Use-case & domain modelling", 2, 2, "Anamika"),
+             ("Architecture & DB design", 3, 2, "Shreya"), ("UML diagrams", 4, 3, "Anamika"),
+             ("Backend: DB + repositories", 5, 3, "Shreya"), ("Backend: services + security", 7, 3, "Shreya"),
+             ("AI module (ML)", 7, 3, "Anamika"), ("Frontend (web UI)", 8, 4, "Anamika"),
+             ("Unit + integration tests", 10, 3, "Shreya"), ("System testing & bug fixing", 12, 2, "Both"),
              ("Report, PPT & demo", 13, 3, "Both")]
-    colors = {"Member 1": "#6366f1", "Member 2": "#ec4899", "Both": "#10b981"}
+    colors = {"Anamika": "#6366f1", "Shreya": "#ec4899", "Both": "#10b981"}
     import datetime as _dt
     start = _dt.date(2026, 10, 31)
     fig, ax = plt.subplots(figsize=(12, 5.5))

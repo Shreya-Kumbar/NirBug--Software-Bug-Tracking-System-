@@ -7,13 +7,13 @@ from .domain import User, Role
 DEMO_PASSWORD = "Demo@1234"
 
 USERS = [
-    ("admin", "admin@bugsense.test", "ADMIN", ""),
-    ("manager", "manager@bugsense.test", "MANAGER", ""),
-    ("dev_alice", "alice@bugsense.test", "DEVELOPER", "ui,performance"),
-    ("dev_bob", "bob@bugsense.test", "DEVELOPER", "auth,api,database"),
-    ("dev_chen", "chen@bugsense.test", "DEVELOPER", "payment,notifications"),
-    ("tester", "tester@bugsense.test", "TESTER", ""),
-    ("reporter", "reporter@bugsense.test", "REPORTER", ""),
+    ("admin", "admin@nirbug.test", "ADMIN", ""),
+    ("manager", "manager@nirbug.test", "MANAGER", ""),
+    ("dev_alice", "alice@nirbug.test", "DEVELOPER", "ui,performance"),
+    ("dev_bob", "bob@nirbug.test", "DEVELOPER", "auth,api,database"),
+    ("dev_chen", "chen@nirbug.test", "DEVELOPER", "payment,notifications"),
+    ("tester", "tester@nirbug.test", "TESTER", ""),
+    ("reporter", "reporter@nirbug.test", "REPORTER", ""),
 ]
 
 BUGS = [

@@ -1,4 +1,4 @@
-"""Builds the project report  ->  docs/BugSense_Project_Report.docx
+"""Builds the project report  ->  docs/NirBug_Project_Report.docx
 
 Run:  python docs/generate_diagrams.py && python docs/build_report.py
 """
@@ -101,7 +101,7 @@ def BREAK():
 # =========================================================== TITLE PAGE
 for _ in range(4):
     doc.add_paragraph()
-p = P("BugSense", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER)
+p = P("NirBug", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER)
 p.runs[0].font.size = Pt(40)
 p.runs[0].font.color.rgb = BRAND
 p = P("An AI-Assisted Software Bug Tracking and Issue Management System", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER)
@@ -109,8 +109,8 @@ p.runs[0].font.size = Pt(16)
 P("Software Engineering – Group Project Report", align=WD_ALIGN_PARAGRAPH.CENTER).runs[0].font.size = Pt(13)
 doc.add_paragraph()
 T(["Member", "Name", "Roll Number", "Primary Responsibility"],
-  [["Member 1", "<Name 1>", "<Roll No. 1>", "Requirements, UML modelling, AI module, Front-end"],
-   ["Member 2", "<Name 2>", "<Roll No. 2>", "Architecture, Database, Back-end services, Security, Testing"]],
+  [["Member 1", "Anamika Chauhan", "IIT2025151", "Requirements, UML modelling, AI module, Front-end"],
+   ["Member 2", "Shreya Kumbar", "IIT2025178", "Architecture, Database, Back-end services, Security, Testing"]],
   [2.5, 3.5, 3, 8])
 P("Technology: Python 3.11 · Flask · SQLite · scikit-learn · HTML/JavaScript · Tailwind CSS · Chart.js · pytest",
   italic=True, align=WD_ALIGN_PARAGRAPH.CENTER)
@@ -136,7 +136,7 @@ P("Software teams discover hundreds of defects during development and after rele
   "Managers cannot see which bugs block a release, developers are overloaded unevenly, and nobody knows the "
   "history of who changed what. This causes delayed releases, poor software quality and unhappy users.")
 H("1.2 Proposed Solution", 2)
-P("BugSense is a web-based bug tracking and issue management system that provides one central place to report, "
+P("NirBug is a web-based bug tracking and issue management system that provides one central place to report, "
   "classify, assign, fix, test and close software bugs. It enforces a well-defined bug life cycle, uses machine "
   "learning to predict bug severity and detect duplicate reports, automatically assigns bugs to the most suitable "
   "developer, tracks versions and releases, and keeps a tamper-evident audit log.")
@@ -154,14 +154,14 @@ P("In scope: multi-project bug tracking, five user roles, AI triage, assignment,
   "delivery, Git/CI integration, file attachments and multi-tenant SaaS hosting.")
 H("1.5 Software Development Life Cycle (SDLC)", 2)
 P("The SDLC is the structured sequence of phases a software product goes through, from the first idea to "
-  "maintenance. For BugSense we used the Iterative Incremental model, run in an Agile / Scrum style.")
+  "maintenance. For NirBug we used the Iterative Incremental model, run in an Agile / Scrum style.")
 H("1.5.1 Model Chosen: Iterative Incremental (Agile / Scrum-based)", 3)
 P("The whole system is not built in one go. It is divided into small increments, and each increment is developed in a "
   "short time-box called a sprint. Every sprint goes through all the SDLC phases (plan, analyse, design, implement, "
   "test, review), so at the end of every sprint there is a working, tested part of the product. The next sprint "
   "adds more features on top of it (incremental) and improves what already exists using feedback (iterative).")
 IMG(os.path.join(DIA, "12_sdlc.png"), "Figure 0 – SDLC model: each sprint runs the full cycle and adds one increment")
-H("1.5.2 Phases of the Life Cycle (as applied in BugSense)", 3)
+H("1.5.2 Phases of the Life Cycle (as applied in NirBug)", 3)
 T(["Phase", "What happens", "Output / artefact in this project"],
   [["1. Planning & Requirements", "Understand the problem, identify users and features, fix scope and schedule",
     "Problem statement, SRS (Section 2), Gantt chart, risk table"],
@@ -190,7 +190,7 @@ P("Scrum practices we followed (scaled down for a two-person team): a product ba
   "two members, and a sprint review/demo at the end of each sprint where the increment was tested and the next "
   "sprint was planned.")
 H("1.5.4 Why This Model? (Comparison with Other SDLC Models)", 3)
-T(["Model", "How it works", "Suitable for BugSense?"],
+T(["Model", "How it works", "Suitable for NirBug?"],
   [["Waterfall", "Phases done once, strictly one after another; no going back", "No – requirements (e.g. AI features, UI) changed during the project; nothing works until the very end"],
    ["V-Model", "Waterfall with a test phase planned for each development phase", "Partly – good testing discipline (we borrowed this idea), but still rigid"],
    ["Spiral", "Iterations driven by risk analysis; suited to large, high-risk projects", "No – too heavy for a 16-day student project"],
@@ -290,7 +290,7 @@ BREAK()
 
 # =========================================================== 4 MODELLING
 H("4. Software Modelling (UML)")
-P("The following UML 2.x diagrams model the static structure and dynamic behaviour of BugSense.")
+P("The following UML 2.x diagrams model the static structure and dynamic behaviour of NirBug.")
 H("4.1 Class Diagram", 2)
 IMG(os.path.join(DIA, "02_class.png"), "Figure 2 – Class diagram (domain + service layer)")
 P("User, Bug and the enumerations form the domain model. BugStateMachine encapsulates life-cycle rules. "
@@ -431,7 +431,7 @@ BREAK()
 
 # =========================================================== 9 SECURITY
 H("9. Security Design (Cyber-security)")
-T(["Threat (STRIDE)", "Mitigation in BugSense"],
+T(["Threat (STRIDE)", "Mitigation in NirBug"],
   [["Spoofing – stolen / guessed passwords", "PBKDF2-SHA256 salted hashes, password policy, account lockout, login rate limit"],
    ["Tampering – forged tokens", "HMAC-signed, time-limited tokens (itsdangerous); signature checked on every request"],
    ["Repudiation", "Audit log with user, action, detail, IP and timestamp; bug_history for every field change"],
@@ -518,7 +518,7 @@ T(["Milestone", "Deliverable", "Date"],
 H("12.2 Schedule (Gantt Chart)", 2)
 IMG(os.path.join(DIA, "10_gantt.png"), "Figure 11 – Gantt chart")
 H("12.3 Work Breakdown and Responsibilities", 2)
-T(["Work package", "Member 1", "Member 2"],
+T(["Work package", "Anamika Chauhan", "Shreya Kumbar"],
   [["Requirements & SRS", "✔ (lead)", "✔"], ["UML diagrams", "✔", ""], ["Architecture & DB design", "", "✔"],
    ["Back-end (DB, services, API)", "", "✔"], ["Security", "", "✔"], ["AI / ML module", "✔", ""],
    ["Front-end UI", "✔", ""], ["Testing", "✔ (system)", "✔ (unit/integration)"], ["Report & PPT", "✔", "✔"]], [7, 5, 5])
@@ -541,8 +541,8 @@ BREAK()
 
 # =========================================================== 14 MAINTENANCE
 H("14. Software Maintenance")
-T(["Type", "Example in BugSense"],
-  [["Corrective", "Fix defects reported through BugSense itself (dog-fooding); regression tests added for every fix"],
+T(["Type", "Example in NirBug"],
+  [["Corrective", "Fix defects reported through NirBug itself (dog-fooding); regression tests added for every fix"],
    ["Adaptive", "Move from SQLite to PostgreSQL (only db.py changes); deploy in Docker / cloud"],
    ["Perfective", "Add e-mail/Slack notifications as a new EventBus listener; file attachments; Git commit linking"],
    ["Preventive", "Periodic dependency updates, retraining the ML model, refactoring, increasing test coverage"]], [3, 14])
@@ -554,13 +554,13 @@ B(["New assignment algorithm → create a subclass of AssignmentStrategy and reg
    "the evaluate() method reports the new accuracy before deployment.",
    "Mobile app → reuse the same REST API."])
 H("14.2 Maintenance Process", 2)
-P("Change requests are themselves logged as issues in BugSense, prioritised by the manager, implemented on a "
+P("Change requests are themselves logged as issues in NirBug, prioritised by the manager, implemented on a "
   "branch, tested by the automated suite (all tests must pass), reviewed, and released with a new version number "
   "(semantic versioning MAJOR.MINOR.PATCH). The audit log and bug history support impact analysis.")
 
 # =========================================================== 15 CONCLUSION
 H("15. Conclusion and Future Scope")
-P("BugSense meets all the required features – bug reporting, severity classification, developer assignment, version "
+P("NirBug meets all the required features – bug reporting, severity classification, developer assignment, version "
   "tracking, testing status and release management – and adds AI-assisted triage, a Kanban board and analytics. "
   "More importantly, it was produced with a systematic SDLC: requirements were specified and traced, the system was "
   "modelled with UML, designed with a layered architecture and design patterns, implemented with OOP, secured "
@@ -592,6 +592,6 @@ T(["Method", "Endpoint", "Role", "Purpose"],
    ["POST", "/api/bugs/{id}/comments", "any", "Comment"], ["GET", "/api/dashboard", "any", "Analytics"],
    ["GET", "/api/audit", "manager", "Audit log"], ["GET", "/api/notifications", "any", "Notifications"]], [2, 7, 3, 5])
 
-out = os.path.join(HERE, "BugSense_Project_Report.docx")
+out = os.path.join(HERE, "NirBug_Project_Report.docx")
 doc.save(out)
 print("wrote", out)

@@ -19,8 +19,8 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 
 def create_app(db_path: str | None = None, seed: bool = True) -> Flask:
     app = Flask(__name__, static_folder=os.path.join(BASE, "static"), static_url_path="/static")
-    db_path = db_path or os.environ.get("BUGSENSE_DB", os.path.join(BASE, "..", "bugsense.db"))
-    secret = os.environ.get("BUGSENSE_SECRET") or secrets.token_hex(32)
+    db_path = db_path or os.environ.get("NIRBUG_DB", os.path.join(BASE, "..", "nirbug.db"))
+    secret = os.environ.get("NIRBUG_SECRET") or secrets.token_hex(32)
 
     db = Database(db_path)
     db.init_schema()

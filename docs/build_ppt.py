@@ -1,4 +1,4 @@
-"""Builds the presentation  ->  docs/BugSense_Presentation.pptx   (16:9, 18 slides)"""
+"""Builds the presentation  ->  docs/NirBug_Presentation.pptx   (16:9, 18 slides)"""
 import os
 
 from pptx import Presentation
@@ -79,11 +79,11 @@ def image(s, path, x=None, y=1.4, w=None, h=5.8):
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, W, H, INDIGO)
 rect(s, Inches(8.5), Inches(-2), Inches(7), Inches(7), PURPLE, MSO_SHAPE.OVAL)
-text(s, Inches(0.8), Inches(1.6), Inches(11), Inches(1.2), "🐞 BugSense", 60, True, WHITE)
+text(s, Inches(0.8), Inches(1.6), Inches(11), Inches(1.2), "🐞 NirBug", 60, True, WHITE)
 text(s, Inches(0.8), Inches(2.9), Inches(10), Inches(1.2),
      "AI-Assisted Software Bug Tracking & Issue Management System", 28, False, WHITE)
 text(s, Inches(0.8), Inches(4.4), Inches(10), Inches(1.5),
-     "Software Engineering Group Project\nMember 1: <Name> (<Roll No>)     Member 2: <Name> (<Roll No>)", 18, False, WHITE)
+     "Software Engineering Group Project\nAnamika Chauhan (IIT2025151)   ·   Shreya Kumbar (IIT2025178)", 18, False, WHITE)
 
 # 2 Problem
 s = slide("Problem Statement", 2)
@@ -176,7 +176,7 @@ bullets(s, ["Unit:|state machine, rules, security, AI", "Integration:|services +
 # 16 Planning
 s = slide("Project Planning", 15)
 image(s, os.path.join(DIA, "10_gantt.png"), y=1.3, h=4.4)
-bullets(s, ["Member 1:|requirements, UML, AI module, front-end", "Member 2:|architecture, database, back-end, security, testing"],
+bullets(s, ["Anamika Chauhan (IIT2025151):|requirements, UML, AI module, front-end", "Shreya Kumbar (IIT2025178):|architecture, database, back-end, security, testing"],
         y=5.9, size=16)
 
 # 17 Maintenance & conclusion
@@ -193,6 +193,6 @@ rect(s, 0, 0, W, H, INDIGO)
 text(s, 0, Inches(2.6), W, Inches(1.2), "Thank You", 60, True, WHITE, PP_ALIGN.CENTER)
 text(s, 0, Inches(3.9), W, Inches(1), "Questions?  ·  Live demo: python -m bugtracker.app", 22, False, WHITE, PP_ALIGN.CENTER)
 
-out = os.path.join(HERE, "BugSense_Presentation.pptx")
+out = os.path.join(HERE, "NirBug_Presentation.pptx")
 prs.save(out)
 print("wrote", out)

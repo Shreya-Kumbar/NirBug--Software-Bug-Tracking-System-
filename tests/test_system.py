@@ -3,7 +3,7 @@
 
 def test_st01_health_and_index(client):
     assert client.get("/api/health").json == {"status": "ok"}
-    assert b"BugSense" in client.get("/").data
+    assert b"NirBug" in client.get("/").data
 
 
 def test_st02_requires_authentication(client):

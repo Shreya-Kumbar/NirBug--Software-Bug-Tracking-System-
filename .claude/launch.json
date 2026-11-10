@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "bugsense", "runtimeExecutable": "python", "runtimeArgs": ["-m", "bugtracker.app"], "port": 5000 }
+    { "name": "nirbug", "runtimeExecutable": "python", "runtimeArgs": ["-m", "bugtracker.app"], "port": 5000 }
   ]
 }
