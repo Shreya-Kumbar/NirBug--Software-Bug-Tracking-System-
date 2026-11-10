@@ -38,4 +38,5 @@ bugtracker/   app.py, routes.py, domain.py, db.py, security.py, seed.py
               services/ (core, assignment, events)   ml/ (classifier, training data)   static/ (UI)
 tests/        test_unit.py, test_integration.py, test_system.py
 docs/         diagrams, screenshots, report & PPT generators and outputs
+              (python docs/take_screenshots.py retakes the screenshots while the app runs)
 ```

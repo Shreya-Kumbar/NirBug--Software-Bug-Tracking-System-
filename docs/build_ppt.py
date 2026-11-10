@@ -1,4 +1,4 @@
-"""Builds the presentation  ->  docs/NirBug_Presentation.pptx   (16:9, 18 slides)"""
+"""Builds the presentation  ->  docs/NirBug_Presentation.pptx   (16:9, 20 slides)"""
 import os
 
 from pptx import Presentation
@@ -162,6 +162,15 @@ bullets(s, ["Severity classifier:|TF-IDF (word + char n-grams) → Logistic Regr
             "Smart assignment:|score = 10·skill_match − workload",
             "Human-in-the-loop:|user can override; AI/human agreement shown on dashboard",
             "Evaluation:|stratified 5-fold cross-validation, beats random baseline; improves as data grows"], size=18)
+
+# Screens (two slides, 4 screenshots each)
+for title, shots in [("Implementation – Screens (1/2)", ["01_login.png", "02_dashboard.png", "03_bug_list.png", "04_board.png"]),
+                     ("Implementation – Screens (2/2)", ["05_report_bug_ai.png", "06_bug_detail.png", "07_releases.png", "08_dashboard_light.png"])]:
+    s = slide(title, 0)
+    for i, f in enumerate(shots):
+        p = os.path.join(SHOT, f)
+        if os.path.exists(p):
+            s.shapes.add_picture(p, Inches(1.9 + (i % 2) * 4.9), Inches(1.4 + (i // 2) * 2.98), width=Inches(4.6))
 
 # 15 Security + Testing
 s = slide("Security & Testing", 14)
