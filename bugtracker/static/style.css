@@ -18,7 +18,7 @@
 .nav-link svg { width:1.15rem; height:1.15rem; }
 .nav-link:hover { background:#1e293b; color:#fff; }
 .nav-link.active { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; }
-.avatar { width:2.25rem; height:2.25rem; border-radius:9999px; display:grid; place-items:center; color:#fff; font-weight:700; background:linear-gradient(135deg,#6366f1,#ec4899); flex-shrink:0; }
+.avatar { width:2.25rem; height:2.25rem; border-radius:9999px; display:grid; place-items:center; color:#fff; font-weight:700; background:linear-gradient(135deg,#6366f1,#8b5cf6); flex-shrink:0; }
 .badge { display:inline-flex; align-items:center; gap:.25rem; padding:.15rem .55rem; border-radius:9999px; font-size:.7rem; font-weight:700; letter-spacing:.02em; white-space:nowrap; }
 .sev-CRITICAL { background:#fee2e2; color:#b91c1c; } .sev-HIGH { background:#ffedd5; color:#c2410c; }
 .sev-MEDIUM { background:#fef9c3; color:#a16207; } .sev-LOW { background:#dcfce7; color:#15803d; }

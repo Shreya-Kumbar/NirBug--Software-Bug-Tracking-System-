@@ -115,40 +115,58 @@ $('#notif-btn').onclick = async () => { $('#notif-panel').classList.toggle('hidd
 
 // ------------------------------------------------------------------ dashboard
 async function viewDashboard() {
-  const d = await api('/dashboard');
-  const stat = (label, val, icon, color) => `<div class="card hoverable glow-card p-5 flex items-center gap-4">
-     <div class="stat-icon ${color}"><i data-lucide="${icon}"></i></div>
-     <div><p class="text-sm text-slate-500">${label}</p><p class="text-3xl font-extrabold" data-count="${esc(val ?? '')}">${val == null ? '–' : 0}</p></div></div>`;
+  const [d, recent] = await Promise.all([api('/dashboard'), api('/bugs')]);
+  const pct = (n) => d.total ? Math.round(100 * n / d.total) : 0;
+  const stat = (label, val, icon, color, sub) => `<div class="card hoverable stat-card px-5 py-4" style="--accent:${color}">
+     <div class="flex items-center justify-between"><p class="text-sm text-slate-400">${label}</p><i data-lucide="${icon}" class="w-4 h-4" style="color:${color}"></i></div>
+     <p class="text-3xl font-bold mt-2 tracking-tight" data-count="${esc(val ?? '')}">${val == null ? '–' : 0}</p>
+     <p class="text-xs text-slate-500 mt-1">${sub}</p></div>`;
   $('#view').innerHTML = `
-  <div class="fade-in space-y-6">
-    <div class="rounded-2xl p-6 banner-anim text-white flex flex-wrap items-center gap-4 shadow-xl shadow-indigo-500/20">
-      <div class="flex-1"><p class="text-indigo-100">Hello ${esc(state.user.username)} 👋</p>
-      <h2 class="text-2xl font-bold">${d.critical_open ? `${d.critical_open} critical bug(s) need attention` : 'No open critical bugs – nice work!'}</h2></div>
-      <div class="glass rounded-xl px-4 py-2 text-sm"><i data-lucide="brain" class="inline w-4 h-4"></i> AI / human severity agreement: <b>${d.ai_agreement ?? '–'}%</b></div>
+  <div class="space-y-6 max-w-7xl">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div><h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">Welcome back, ${esc(state.user.username)}</h2>
+        <p class="text-sm text-slate-400 mt-1">Here's what's happening across your projects.</p></div>
+      <div class="flex items-center gap-2 text-sm">
+        ${d.critical_open ? `<span class="pill pill-danger"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>${d.critical_open} critical open</span>` : `<span class="pill pill-ok">No critical bugs</span>`}
+        <span class="pill">AI agreement ${d.ai_agreement ?? '–'}%</span>
+      </div>
     </div>
-    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger">
-      ${stat('Total bugs', d.total, 'bug', 'bg-indigo-100 text-indigo-600')}
-      ${stat('Open', d.open, 'circle-dot', 'bg-amber-100 text-amber-600')}
-      ${stat('Resolved', d.closed, 'circle-check', 'bg-emerald-100 text-emerald-600')}
-      ${stat('Avg. time to close (days)', d.mttr_days, 'timer', 'bg-rose-100 text-rose-600')}
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      ${stat('Total bugs', d.total, 'bug', '#f9a8d4', 'Across all projects')}
+      ${stat('Open', d.open, 'circle-dot', '#fbbf24', `${pct(d.open)}% of total`)}
+      ${stat('Resolved', d.closed, 'circle-check', '#34d399', `${pct(d.closed)}% resolution rate`)}
+      ${stat('Avg. days to close', d.mttr_days ?? 0, 'timer', '#7dd3fc', 'Mean time to resolution')}
     </div>
-    <div class="grid lg:grid-cols-3 gap-4">
-      <div class="card p-5"><h3 class="font-bold mb-4">By severity</h3><canvas id="c-sev" height="220"></canvas></div>
-      <div class="card p-5 lg:col-span-2"><h3 class="font-bold mb-4">By status</h3><canvas id="c-status" height="110"></canvas></div>
+    <div class="grid lg:grid-cols-3 gap-4 stagger">
+      <div class="card hoverable glow-panel p-5" style="--accent:#fdba74"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-sm">By severity</h3><span class="chip"><i data-lucide="pie-chart"></i></span></div>
+        <div class="relative"><canvas id="c-sev" height="230"></canvas>
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style="bottom:42px"><p class="text-2xl font-bold">${d.total}</p><p class="text-xs text-slate-400">bugs</p></div></div></div>
+      <div class="card hoverable glow-panel p-5 lg:col-span-2" style="--accent:#93c5fd"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-sm">By status</h3><span class="chip"><i data-lucide="bar-chart-3"></i></span></div><canvas id="c-status" height="115"></canvas></div>
     </div>
-    <div class="card p-5"><h3 class="font-bold mb-4">Developer workload <span class="text-xs font-normal text-slate-400">(severity-weighted, used by auto-assignment)</span></h3>
-      <div class="space-y-3">${d.workload.map(w => `<div class="flex items-center gap-3">
-        <div class="avatar !w-8 !h-8 text-xs">${initials(w.username)}</div><div class="w-28 text-sm font-medium">${esc(w.username)}</div>
-        <div class="flex-1 h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden"><div class="h-full bar-fill bg-gradient-to-r from-brand-500 to-fuchsia-500" style="width:${Math.min(100, w.load_score * 8)}%"></div></div>
-        <div class="w-40 text-xs text-slate-500">${w.open_bugs} open · load ${w.load_score} · ${esc(w.skills)}</div></div>`).join('')}</div></div>
+    <div class="grid lg:grid-cols-5 gap-4 stagger">
+      <div class="card hoverable glow-panel p-5 lg:col-span-3" style="--accent:#5eead4"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-sm">Developer workload</h3><span class="flex items-center gap-3"><span class="text-xs text-slate-500">Severity-weighted</span><span class="chip"><i data-lucide="users"></i></span></span></div>
+        <div class="space-y-4">${d.workload.map(w => `<div class="flex items-center gap-3">
+          <div class="avatar !w-8 !h-8 text-[11px]">${initials(w.username)}</div>
+          <div class="flex-1"><div class="flex justify-between text-sm"><span class="font-medium">${esc(w.username)}</span><span class="text-slate-500 text-xs">${w.open_bugs} open · load ${w.load_score}</span></div>
+          <div class="mt-1.5 h-1.5 rounded-full bg-white/[.06] overflow-hidden"><div class="h-full bar-fill rounded-full bg-indigo-400" style="width:${Math.min(100, w.load_score * 8)}%"></div></div></div></div>`).join('')}</div></div>
+      <div class="card hoverable glow-panel p-5 lg:col-span-2" style="--accent:#7dd3fc"><div class="flex justify-between items-center mb-4"><h3 class="font-semibold text-sm">Recent bugs</h3><span class="flex items-center gap-3"><a href="#bugs" class="text-xs text-indigo-400 hover:underline">View all</a><span class="chip"><i data-lucide="activity"></i></span></span></div>
+        <div class="space-y-2">${recent.slice(0, 5).map(b => `<div class="recent-row" data-id="${b.id}">
+          <span class="sev-dot sev-dot-${esc(b.severity)}"></span>
+          <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${esc(b.title)}</p><p class="text-[11px] text-slate-400">#${b.id} · ${esc(b.component)} · ${ago(b.updated_at)}</p></div>${st(b.status)}</div>`).join('') || '<p class="text-sm text-slate-400">No bugs yet.</p>'}</div></div>
+    </div>
   </div>`;
+  $$('.recent-row').forEach(r => r.onclick = () => openBug(r.dataset.id));
   const dark = document.documentElement.classList.contains('dark'); Chart.defaults.color = dark ? '#94a3b8' : '#64748b';
+  Chart.defaults.font.family = 'Inter'; Chart.defaults.borderColor = dark ? 'rgba(148,163,184,.08)' : 'rgba(100,116,139,.12)';
   state.charts.push(new Chart($('#c-sev'), { type: 'doughnut', data: { labels: SEVS,
-    datasets: [{ data: SEVS.map(s => d.by_severity[s] || 0), backgroundColor: ['#ef4444','#f97316','#eab308','#22c55e'], borderWidth: 0 }] },
-    options: { cutout: '65%', plugins: { legend: { position: 'bottom' } } } }));
+    datasets: [{ data: SEVS.map(s => d.by_severity[s] || 0), backgroundColor: dark ? ['#fb7185cc','#fdba74cc','#fde68acc','#6ee7b7cc'] : ['#fda4af','#fdba74','#fde68a','#86efac'], borderWidth: 0, hoverOffset: 4, spacing: 2, borderRadius: 4 }] },
+    options: { cutout: '72%', animation: { animateRotate: true, duration: 1200 }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14 } } } } }));
+  const ctx = $('#c-status').getContext('2d'), g = ctx.createLinearGradient(0, 0, 0, 260);
+  g.addColorStop(0, dark ? '#c4b5fd' : '#c4b5fd'); g.addColorStop(1, dark ? '#818cf8' : '#a5b4fc');
   state.charts.push(new Chart($('#c-status'), { type: 'bar', data: { labels: STATUSES.map(s => s.replace('_',' ')),
-    datasets: [{ data: STATUSES.map(s => d.by_status[s] || 0), backgroundColor: '#6366f1', borderRadius: 8 }] },
-    options: { plugins: { legend: { display: false } }, scales: { y: { ticks: { precision: 0 } } } } }));
+    datasets: [{ data: STATUSES.map(s => d.by_status[s] || 0), backgroundColor: g, hoverBackgroundColor: '#c4b5fd', borderRadius: 6, borderSkipped: false, maxBarThickness: 36 }] },
+    options: { animation: { duration: 1200, easing: 'easeOutQuart' }, plugins: { legend: { display: false } },
+      scales: { y: { ticks: { precision: 0 }, grid: { color: 'rgba(148,163,184,.08)' } }, x: { grid: { display: false } } } } }));
 }
 
 // ------------------------------------------------------------------ bug list
@@ -226,7 +244,8 @@ function openNewBug() {
       </div>
     </div>
     <div class="space-y-3"><div class="rounded-xl p-4 bg-gradient-to-br from-brand-50 to-fuchsia-50 dark:from-slate-800 dark:to-slate-800 text-sm ai-glow" id="ai-box">
-      <p class="font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>AI Triage</p><p class="text-slate-500 mt-2">Start typing a title and description…</p></div></div>
+      <p class="font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>AI Triage</p><p class="text-slate-400 mt-2 text-xs leading-relaxed">This panel is read-only. As you type the <b>Title</b> and <b>Description</b> on the left, the AI will show here:</p>
+      <ul class="mt-2 space-y-1 text-xs text-slate-400"><li>• Predicted severity</li><li>• Likely component</li><li>• Possible duplicate bugs</li></ul></div></div>
     <div class="md:col-span-3 flex justify-end gap-2"><button type="button" class="btn" id="cancel-bug">Cancel</button><button class="btn-primary">Submit bug</button></div>
   </form>`);
   const form = $('#bug-form');

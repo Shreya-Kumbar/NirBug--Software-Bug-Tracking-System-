@@ -66,7 +66,8 @@ def use_case():
     ax.add_patch(FancyBboxPatch((25, 3), 80, 92, boxstyle="round,pad=0,rounding_size=2", fc="#fafafa", ec=INK))
     ax.text(65, 92, "BugSense System", ha="center", fontweight="bold", fontsize=11)
     ucs = {
-        "login": (45, 85, "Register / Login"), "report": (45, 76, "Report Bug"),
+        "login": (45, 85, "Login / Logout"), "register": (85, 85, "Register (self sign-up)"),
+        "report": (45, 76, "Report Bug"),
         "ai": (85, 76, "AI Severity Prediction"), "dup": (85, 67, "Detect Duplicates"),
         "search": (45, 67, "Search & Filter Bugs"), "comment": (45, 58, "Comment on Bug"),
         "assign": (45, 49, "Assign Developer"), "auto": (85, 49, "Auto-assign (Strategy)"),
@@ -79,8 +80,10 @@ def use_case():
     actors = {"Reporter": (10, 72), "Developer": (10, 42), "Tester": (10, 22), "Manager": (120, 55), "Admin": (120, 15)}
     for n, (x, y) in actors.items():
         actor(ax, x, y, n)
-    links = {"Reporter": ["login", "report", "search", "comment"], "Developer": ["status", "comment", "search"],
-             "Tester": ["verify", "report"], "Manager": ["assign", "release", "dash", "audit"], "Admin": ["users", "audit"]}
+    links = {"Reporter": ["login", "register", "report", "search", "comment"],
+             "Developer": ["login", "status", "comment", "search"],
+             "Tester": ["login", "verify", "report"],
+             "Manager": ["login", "assign", "release", "dash", "audit"], "Admin": ["login", "users", "audit"]}
     for a, ucl in links.items():
         ax_, ay = actors[a]
         for u in ucl:
@@ -92,7 +95,9 @@ def use_case():
         x1, y1, _ = ucs[a]
         x2, y2, _ = ucs[b]
         arrow(ax, (x1 + 12, y1), (x2 - 12, y2), lbl, dashed=True)
-    ax.text(65, 5, "Generalisation: Admin ⊃ Manager ⊃ Developer/Tester ⊃ Reporter (every user can report bugs)",
+    ax.text(65, 6.5, "All actors log in. Only Reporters self-register; the Admin creates other accounts (Manage Users).",
+            ha="center", fontsize=7.5, style="italic")
+    ax.text(65, 4, "Generalisation: Admin ⊃ Manager ⊃ Developer/Tester ⊃ Reporter (every user can report bugs)",
             ha="center", fontsize=7.5, style="italic")
     save(fig, "01_use_case.png")
 
