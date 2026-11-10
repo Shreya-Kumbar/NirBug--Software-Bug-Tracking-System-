@@ -15,7 +15,7 @@ developer assignment, version tracking, testing status and release management.
 ## Run
 ```bash
 pip install -r requirements.txt
-python -m bugtracker.app
+⭐ python -m bugtracker.app
 ```
 Open http://127.0.0.1:5000 — demo accounts `admin`, `manager`, `dev_alice`, `dev_bob`, `dev_chen`, `tester`,
 `reporter`, all with password `Demo@1234`. Delete `nirbug.db` to reset the demo data.
