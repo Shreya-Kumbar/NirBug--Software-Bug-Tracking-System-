@@ -119,12 +119,13 @@ BREAK()
 
 # =========================================================== CONTENTS
 H("Table of Contents")
-for line in ["1. Introduction", "2. Software Requirements Specification (SRS)", "3. Requirement Analysis & Use Cases",
-             "4. Software Modelling (UML)", "5. Software Architecture & Design", "6. Database Design",
-             "7. Implementation", "8. AI / Machine-Learning Module", "9. Security Design",
-             "10. Software Testing", "11. Software Quality Assurance", "12. Project Planning & Management",
-             "13. Risk Management", "14. Software Maintenance", "15. Conclusion & Future Scope",
-             "Appendix A – How to Run", "Appendix B – API Reference"]:
+for line in ["1. Introduction", "2. Software Development Life Cycle (SDLC) – Model, Phases & Sprints",
+             "3. Software Requirements Specification (SRS)", "4. Requirement Analysis & Use Cases",
+             "5. Software Modelling (UML)", "6. Software Architecture & Design", "7. Database Design",
+             "8. Implementation", "9. AI / Machine-Learning Module", "10. Security Design",
+             "11. Software Testing", "12. Software Quality Assurance", "13. Project Planning & Management",
+             "14. Risk Management", "15. Software Maintenance", "16. Conclusion & Future Scope",
+             "Appendix A – How to Run", "Appendix B – REST API Reference"]:
     P(line)
 BREAK()
 
@@ -152,32 +153,33 @@ H("1.4 Scope", 2)
 P("In scope: multi-project bug tracking, five user roles, AI triage, assignment, comments, history, notifications, "
   "releases, dashboard analytics, audit log, REST API and a responsive web UI. Out of scope (future work): e-mail "
   "delivery, Git/CI integration, file attachments and multi-tenant SaaS hosting.")
-H("1.5 Software Development Life Cycle (SDLC)", 2)
+BREAK()
+H("2. Software Development Life Cycle (SDLC)")
 P("The SDLC is the structured sequence of phases a software product goes through, from the first idea to "
   "maintenance. For NirBug we used the Iterative Incremental model, run in an Agile / Scrum style.")
-H("1.5.1 Model Chosen: Iterative Incremental (Agile / Scrum-based)", 3)
+H("2.1 Model Chosen: Iterative Incremental (Agile / Scrum-based)", 2)
 P("The whole system is not built in one go. It is divided into small increments, and each increment is developed in a "
   "short time-box called a sprint. Every sprint goes through all the SDLC phases (plan, analyse, design, implement, "
   "test, review), so at the end of every sprint there is a working, tested part of the product. The next sprint "
   "adds more features on top of it (incremental) and improves what already exists using feedback (iterative).")
-IMG(os.path.join(DIA, "12_sdlc.png"), "Figure 0 – SDLC model: each sprint runs the full cycle and adds one increment")
-H("1.5.2 Phases of the Life Cycle (as applied in NirBug)", 3)
+IMG(os.path.join(DIA, "12_sdlc.png"), "Figure 2.1 – SDLC model: each sprint runs the full cycle and adds one increment")
+H("2.2 Phases of the Life Cycle (as applied in NirBug)", 2)
 T(["Phase", "What happens", "Output / artefact in this project"],
   [["1. Planning & Requirements", "Understand the problem, identify users and features, fix scope and schedule",
-    "Problem statement, SRS (Section 2), Gantt chart, risk table"],
+    "Problem statement, SRS (Section 3), Gantt chart, risk table"],
    ["2. Analysis", "Study stakeholders, use cases, feasibility; refine and prioritise requirements",
-    "Stakeholder list, use-case diagram & descriptions, feasibility study (Section 3)"],
+    "Stakeholder list, use-case diagram & descriptions, feasibility study (Section 4)"],
    ["3. Design", "Decide architecture, modules, database and UI; model the system with UML",
-    "Layered architecture, class/sequence/activity/state diagrams, ER diagram, design patterns (Sections 4–6)"],
+    "Layered architecture, class/sequence/activity/state diagrams, ER diagram, design patterns (Sections 5–7)"],
    ["4. Implementation (Coding)", "Write the code module by module following the design",
-    "Flask back-end, SQLite DB, AI module, web front-end (Sections 7–9)"],
+    "Flask back-end, SQLite DB, AI module, web front-end (Sections 8–10)"],
    ["5. Testing", "Verify each part and the whole system against the requirements",
-    "63 automated unit, integration and system tests, traceability matrix (Sections 10–11)"],
+    "63 automated unit, integration and system tests, traceability matrix (Sections 11–12)"],
    ["6. Deployment & Review", "Run the increment, demo it, collect feedback, plan the next sprint",
     "Working increment at the end of each sprint, final demo on 15 Nov"],
    ["7. Maintenance", "Fix, adapt and improve the system after delivery",
-    "Maintenance plan (Section 14)"]], [3.6, 6.4, 7])
-H("1.5.3 Sprints (Increments) on Our Timeline", 3)
+    "Maintenance plan (Section 15)"]], [3.6, 6.4, 7])
+H("2.3 Sprints (Increments) on Our Timeline", 2)
 T(["Sprint", "Dates", "Increment delivered", "Phases covered"],
   [["Sprint 1", "31 Oct – 4 Nov 2026", "SRS, use cases, architecture, DB schema, login & registration",
     "Planning, Analysis, Design, first Implementation + tests"],
@@ -189,7 +191,7 @@ P("Scrum practices we followed (scaled down for a two-person team): a product ba
   "requirements FR-01 to FR-16), sprint planning at the start of each sprint, short daily check-ins between the "
   "two members, and a sprint review/demo at the end of each sprint where the increment was tested and the next "
   "sprint was planned.")
-H("1.5.4 Why This Model? (Comparison with Other SDLC Models)", 3)
+H("2.4 Why This Model? (Comparison with Other SDLC Models)", 2)
 T(["Model", "How it works", "Suitable for NirBug?"],
   [["Waterfall", "Phases done once, strictly one after another; no going back", "No – requirements (e.g. AI features, UI) changed during the project; nothing works until the very end"],
    ["V-Model", "Waterfall with a test phase planned for each development phase", "Partly – good testing discipline (we borrowed this idea), but still rigid"],
@@ -197,7 +199,7 @@ T(["Model", "How it works", "Suitable for NirBug?"],
    ["Prototype", "Build a throw-away prototype to discover requirements", "Partly – we used a quick UI prototype for the report-bug flow"],
    ["Iterative Incremental (Agile/Scrum) ✔", "Small time-boxed sprints, each delivers a working increment",
     "Yes – short deadline, small team, changing requirements, early working product, continuous testing"]], [3.4, 6, 7.6])
-H("1.5.5 Advantages Observed", 3)
+H("2.5 Advantages Observed", 2)
 B(["A working version existed after Sprint 1, so the risk of having nothing to submit was low.",
    "Requirement changes (e.g. adding duplicate detection and release readiness) were absorbed in the next sprint.",
    "Testing happened in every sprint, so bugs were found early and cheaply.",
@@ -205,16 +207,16 @@ B(["A working version existed after Sprint 1, so the risk of having nothing to s
 BREAK()
 
 # =========================================================== 2 SRS
-H("2. Software Requirements Specification (SRS)")
+H("3. Software Requirements Specification (SRS)")
 P("This section follows the structure of IEEE 830 / ISO/IEC/IEEE 29148.", italic=True)
-H("2.1 Users (Actors) and Characteristics", 2)
+H("3.1 Users (Actors) and Characteristics", 2)
 T(["Role", "Description", "Key permissions"],
   [["Reporter", "Any end user / client who finds a bug", "Register, report bugs, comment, view own bugs"],
    ["Developer", "Fixes bugs; has skills (ui, api, auth …)", "Start work, mark FIXED, comment"],
    ["Tester (QA)", "Verifies fixes", "Move FIXED → IN_TESTING → VERIFIED / REOPENED, mark DUPLICATE"],
    ["Manager", "Team lead / project manager", "Assign bugs, manage projects & releases, view audit log"],
    ["Admin", "System administrator", "All manager rights + create users with any role"]], [3, 6, 8])
-H("2.2 Functional Requirements", 2)
+H("3.2 Functional Requirements", 2)
 T(["ID", "Requirement", "Priority"],
   [["FR-01", "The system shall allow users to register and log in with username and password.", "High"],
    ["FR-02", "The system shall support five roles and restrict actions by role (RBAC).", "High"],
@@ -232,7 +234,7 @@ T(["ID", "Requirement", "Priority"],
    ["FR-14", "The system shall show a dashboard (counts by status/severity, workload, mean time to close, AI agreement).", "Medium"],
    ["FR-15", "The system shall record security-relevant actions in an audit log viewable by managers/admins.", "High"],
    ["FR-16", "A Kanban board shall allow changing bug status by drag-and-drop.", "Low"]], [1.8, 12.5, 2])
-H("2.3 Non-Functional Requirements", 2)
+H("3.3 Non-Functional Requirements", 2)
 T(["ID", "Category", "Requirement"],
   [["NFR-01", "Security", "Passwords hashed with PBKDF2-SHA256 (600 000 iterations, salted); never stored in plain text."],
    ["NFR-02", "Security", "Account locked for 15 min after 5 failed logins; login endpoint rate-limited to 10 req/min/IP."],
@@ -244,7 +246,7 @@ T(["ID", "Category", "Requirement"],
    ["NFR-08", "Portability", "Runs on Windows/Linux/macOS with Python 3.10+; no external DB server needed."],
    ["NFR-09", "Accountability", "Every create/assign/status change is written to bug_history and audit_log with timestamp and actor."],
    ["NFR-10", "Availability", "Stateless API (token auth) so it can be scaled horizontally behind a load balancer."]], [1.8, 2.7, 12])
-H("2.4 Constraints and Assumptions", 2)
+H("3.4 Constraints and Assumptions", 2)
 B(["Development time of 16 days (31 Oct – 15 Nov 2026) and a team of 2 students.",
    "Free/open-source technologies only (Python, Flask, SQLite, scikit-learn).",
    "The AI model is trained on a small labelled dataset; humans can always override its prediction.",
@@ -252,8 +254,8 @@ B(["Development time of 16 days (31 Oct – 15 Nov 2026) and a team of 2 student
 BREAK()
 
 # =========================================================== 3 ANALYSIS
-H("3. Requirement Analysis")
-H("3.1 Stakeholders", 2)
+H("4. Requirement Analysis")
+H("4.1 Stakeholders", 2)
 T(["Stakeholder", "Interest / Goal"],
   [["End users / clients", "Report problems easily and know when they are fixed"],
    ["Developers", "Clear, prioritised list of work; fair workload"],
@@ -261,19 +263,19 @@ T(["Stakeholder", "Interest / Goal"],
    ["Project managers", "Visibility of progress, blockers and release readiness"],
    ["System administrator", "Security, user management, audit"],
    ["Course instructor / evaluator", "Demonstration of SE principles"]], [5, 12])
-H("3.2 Requirement Elicitation Techniques", 2)
+H("4.2 Requirement Elicitation Techniques", 2)
 B(["Study of existing tools (Jira, Bugzilla, GitHub Issues) – document analysis.",
    "Brainstorming sessions within the team and informal interviews with fellow students who work on projects.",
    "Prototyping: an early UI mock-up was used to validate the bug-reporting flow."])
-H("3.3 Feasibility Study", 2)
+H("4.3 Feasibility Study", 2)
 T(["Type", "Assessment"],
   [["Technical", "Feasible – mature open-source stack the team knows (Python, Flask, SQL)."],
    ["Economic", "Feasible – zero licence cost; runs on a laptop or a low-cost cloud VM."],
    ["Operational", "Feasible – familiar web UI, role-based workflow mirrors real teams."],
    ["Schedule", "Feasible – scope fixed to 16 FRs across 3 sprints."]], [3, 14])
-H("3.4 Use-Case Diagram", 2)
+H("4.4 Use-Case Diagram", 2)
 IMG(os.path.join(DIA, "01_use_case.png"), "Figure 1 – Use-case diagram")
-H("3.5 Use-Case Descriptions", 2)
+H("4.5 Use-Case Descriptions", 2)
 for name, rows in [
     ("UC-02 Report Bug", [["Actor", "Reporter (any logged-in user)"], ["Pre-condition", "User is logged in; at least one project exists"],
                           ["Main flow", "1. User opens Report Bug.  2. Enters title & description.  3. System shows AI-predicted severity, component and duplicates.  4. User submits.  5. System validates, derives priority, stores bug with status NEW, writes history & audit, returns bug id."],
@@ -289,18 +291,18 @@ for name, rows in [
 BREAK()
 
 # =========================================================== 4 MODELLING
-H("4. Software Modelling (UML)")
+H("5. Software Modelling (UML)")
 P("The following UML 2.x diagrams model the static structure and dynamic behaviour of NirBug.")
-H("4.1 Class Diagram", 2)
+H("5.1 Class Diagram", 2)
 IMG(os.path.join(DIA, "02_class.png"), "Figure 2 – Class diagram (domain + service layer)")
 P("User, Bug and the enumerations form the domain model. BugStateMachine encapsulates life-cycle rules. "
   "BugService is the main control class; it depends on the abstract AssignmentStrategy (Strategy pattern), "
   "BugIntelligence (AI) and Repository (data access). EventBus with AuditListener implements the Observer pattern.")
-H("4.2 Sequence Diagram", 2)
+H("5.2 Sequence Diagram", 2)
 IMG(os.path.join(DIA, "03_sequence.png"), "Figure 3 – Sequence diagram for reporting a bug")
-H("4.3 Activity Diagram", 2)
+H("5.3 Activity Diagram", 2)
 IMG(os.path.join(DIA, "04_activity.png"), "Figure 4 – Activity diagram: triage and resolution", 12)
-H("4.4 State Machine Diagram", 2)
+H("5.4 State Machine Diagram", 2)
 IMG(os.path.join(DIA, "05_state.png"), "Figure 5 – Bug life-cycle state machine")
 T(["From", "To", "Allowed roles"],
   [["NEW", "ASSIGNED / REJECTED / DUPLICATE", "Manager, Admin (Tester for DUPLICATE)"],
@@ -308,19 +310,19 @@ T(["From", "To", "Allowed roles"],
    ["IN_PROGRESS", "FIXED", "Developer"], ["FIXED", "IN_TESTING", "Tester"],
    ["IN_TESTING", "VERIFIED / REOPENED", "Tester"], ["VERIFIED", "CLOSED", "Tester, Manager"],
    ["CLOSED", "REOPENED", "Tester, Manager"], ["REOPENED", "ASSIGNED / IN_PROGRESS", "Manager / Developer"]], [3, 6, 8])
-H("4.5 Data Flow Diagram", 2)
+H("5.5 Data Flow Diagram", 2)
 IMG(os.path.join(DIA, "08_dfd.png"), "Figure 6 – Level-1 DFD")
 BREAK()
 
 # =========================================================== 5 ARCHITECTURE
-H("5. Software Architecture and Design")
-H("5.1 Architectural Style – Layered (3-tier, MVC-style)", 2)
+H("6. Software Architecture and Design")
+H("6.1 Architectural Style – Layered (3-tier, MVC-style)", 2)
 IMG(os.path.join(DIA, "07_architecture.png"), "Figure 7 – Layered architecture")
 P("Justification: a layered architecture separates presentation, business logic and data access. Each layer can be "
   "tested independently (we unit-test the domain without a database), replaced independently (SQLite → PostgreSQL "
   "only touches db.py) and understood by new developers quickly. The front-end is a single-page application that "
   "talks to a stateless JSON REST API, which also allows a future mobile app to reuse the same back-end.")
-H("5.2 Module / Component Responsibilities", 2)
+H("6.2 Module / Component Responsibilities", 2)
 IMG(os.path.join(DIA, "11_component.png"), "Figure 8 – Component diagram")
 T(["Module", "File", "Responsibility"],
   [["Web UI", "static/index.html, app.js, style.css", "Screens, forms, charts, Kanban board, XSS-safe rendering"],
@@ -332,7 +334,7 @@ T(["Module", "File", "Responsibility"],
    ["Events", "services/events.py", "Observer pattern – audit & notification listeners"],
    ["AI Engine", "ml/classifier.py", "Severity classifier, duplicate detection, component guess"],
    ["Persistence", "db.py", "Schema, repositories, parameterised SQL"]], [2.8, 5.2, 9])
-H("5.3 Design Patterns Used", 2)
+H("6.3 Design Patterns Used", 2)
 T(["Pattern", "Where", "Why"],
   [["Repository", "db.py", "Hides SQL from business logic; easy to swap database"],
    ["Strategy", "AssignmentStrategy", "Interchangeable assignment algorithms (Open/Closed principle)"],
@@ -341,18 +343,18 @@ T(["Pattern", "Where", "Why"],
    ["Factory", "create_app()", "Builds configured app instances (prod, test with in-memory DB)"],
    ["Facade / DI", "Services class", "Wires dependencies in one place, injects them into services"],
    ["Decorator", "@login_required", "Cross-cutting authentication & authorisation"]], [3.5, 4, 9.5])
-H("5.4 Design Principles", 2)
+H("6.4 Design Principles", 2)
 B([("SOLID:", "Single responsibility per module; Open/Closed via strategies; Liskov – both strategies substitutable; "
     "Interface segregation – small repository classes; Dependency inversion – services depend on abstractions."),
    ("High cohesion, low coupling:", "each layer only calls the layer below it; events remove direct dependencies."),
    ("DRY:", "generic Repository CRUD reused by all tables."),
    ("Fail-safe defaults:", "self-registration can never grant privileged roles; unknown actions are denied.")])
-H("5.5 Deployment", 2)
+H("6.5 Deployment", 2)
 IMG(os.path.join(DIA, "09_deployment.png"), "Figure 9 – Deployment diagram", 13)
 BREAK()
 
 # =========================================================== 6 DATABASE
-H("6. Database Design (DBMS)")
+H("7. Database Design (DBMS)")
 IMG(os.path.join(DIA, "06_er.png"), "Figure 10 – ER diagram")
 P("The schema is in Third Normal Form: every non-key attribute depends only on the primary key (e.g. project name "
   "lives only in projects, not repeated in bugs). Relationships are enforced with FOREIGN KEY constraints, and "
@@ -366,8 +368,8 @@ B([("Indexes:", "idx_bugs_status, idx_bugs_assignee, idx_bugs_project speed up t
 BREAK()
 
 # =========================================================== 7 IMPLEMENTATION
-H("7. Implementation")
-H("7.1 Technology Stack", 2)
+H("8. Implementation")
+H("8.1 Technology Stack", 2)
 T(["Layer", "Technology", "Reason"],
   [["Front-end", "HTML5, JavaScript (ES2020), Tailwind CSS, Chart.js, Lucide icons", "Modern responsive UI without a build step"],
    ["Back-end", "Python 3.11, Flask 3", "Lightweight, readable, great for REST APIs"],
@@ -376,7 +378,7 @@ T(["Layer", "Technology", "Reason"],
    ["Security", "werkzeug (PBKDF2), itsdangerous (HMAC tokens)", "Well-audited primitives"],
    ["Testing", "pytest", "Concise tests, fixtures, parametrisation"],
    ["Docs", "matplotlib, python-docx, python-pptx", "Diagrams and documents generated from code"]], [2.5, 7, 7.5])
-H("7.2 Project Structure", 2)
+H("8.2 Project Structure", 2)
 P("""bugtracker/
   app.py            application factory, security headers
   routes.py         REST API (controller layer)
@@ -389,20 +391,20 @@ P("""bugtracker/
   static/           index.html, app.js, style.css
 tests/              test_unit.py, test_integration.py, test_system.py
 docs/               diagrams, screenshots, report & PPT generators""").runs[0].font.name = "Consolas"
-H("7.3 OOP Concepts Applied", 2)
+H("8.3 OOP Concepts Applied", 2)
 B([("Encapsulation:", "Bug.transition() is the only way to change a Bug's status; it validates internally."),
    ("Abstraction:", "AssignmentStrategy is an abstract base class (abc.ABC) with abstract method choose()."),
    ("Inheritance:", "LeastLoadedStrategy and SkillBasedStrategy inherit AssignmentStrategy; every XxxRepository inherits Repository."),
    ("Polymorphism:", "BugService calls strategy.choose() without knowing which concrete strategy it is."),
    ("Enumerations & data classes:", "Role, Severity, Status, Priority as Enum; User and Bug as @dataclass.")])
-H("7.4 Key Algorithm – Skill-based Auto-assignment", 2)
+H("8.4 Key Algorithm – Skill-based Auto-assignment", 2)
 P("For every developer d:  score(d) = 10 × [bug.component ∈ d.skills] − load(d),  where load(d) = Σ severity weight "
   "(CRITICAL 4, HIGH 3, MEDIUM 2, LOW 1) of d's open bugs. The developer with the highest score is chosen. This "
   "balances expertise and workload. Complexity: O(n) in the number of developers.")
 BREAK()
 
 # =========================================================== 8 AI
-H("8. AI / Machine-Learning Module")
+H("9. AI / Machine-Learning Module")
 B([("Problem:", "manual triage is slow and inconsistent; duplicates waste developer time."),
    ("Severity classifier:", "text = title + description → TF-IDF features (word 1-2 grams + character 2-5 grams) → "
     "multinomial Logistic Regression → probability for each class. Output: predicted label + confidence."),
@@ -412,7 +414,7 @@ B([("Problem:", "manual triage is slow and inconsistent; duplicates waste develo
    ("Component guess:", "keyword-based expert rules (auth, ui, api, database, payment, performance, notifications)."),
    ("Human-in-the-loop:", "the user can override severity; both the AI value and the final value are stored so the "
     "dashboard shows the AI/human agreement rate, which is used to monitor model quality in production.")])
-H("8.1 Evaluation", 2)
+H("9.1 Evaluation", 2)
 try:
     import sys
     sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..")))
@@ -426,11 +428,11 @@ T(["Metric", "Value"],
    ["Random baseline (4 classes)", ev["random_baseline"]]], [7, 6])
 P("Discussion: with only 80 labelled examples the model is clearly better than random but not perfect, which is why "
   "it is used as a suggestion, not a decision. Accuracy is expected to improve as real bugs (with human-corrected "
-  "labels) are added to the training set – this retraining is part of the maintenance plan (Section 14).")
+  "labels) are added to the training set – this retraining is part of the maintenance plan (Section 15).")
 BREAK()
 
 # =========================================================== 9 SECURITY
-H("9. Security Design (Cyber-security)")
+H("10. Security Design (Cyber-security)")
 T(["Threat (STRIDE)", "Mitigation in NirBug"],
   [["Spoofing – stolen / guessed passwords", "PBKDF2-SHA256 salted hashes, password policy, account lockout, login rate limit"],
    ["Tampering – forged tokens", "HMAC-signed, time-limited tokens (itsdangerous); signature checked on every request"],
@@ -441,7 +443,7 @@ T(["Threat (STRIDE)", "Mitigation in NirBug"],
    ["SQL injection", "Only parameterised queries (?) – verified by test IT-15"],
    ["Cross-site scripting", "Front-end escapes all server data (esc()); Content-Security-Policy header"],
    ["Clickjacking / MIME sniffing", "X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy"]], [6, 11])
-H("9.1 Networking Aspects", 2)
+H("10.1 Networking Aspects", 2)
 P("The client and server communicate over HTTP using a REST architecture with JSON payloads and standard status "
   "codes (200, 201, 400, 401, 403, 404, 409, 423, 429). Authentication is stateless (Bearer token in the "
   "Authorization header), so any number of server instances can run behind a load balancer. In production the "
@@ -449,8 +451,8 @@ P("The client and server communicate over HTTP using a REST architecture with JS
 BREAK()
 
 # =========================================================== 10 TESTING
-H("10. Software Testing")
-H("10.1 Test Strategy", 2)
+H("11. Software Testing")
+H("11.1 Test Strategy", 2)
 P("We followed the testing pyramid: many fast unit tests, fewer integration tests and a set of black-box "
   "system tests through the HTTP API. All 63 automated tests are written with pytest and run with one command "
   "(python -m pytest). Techniques used: equivalence partitioning, boundary value analysis (priority rules, "
@@ -460,7 +462,7 @@ T(["Level", "File", "Count", "What is tested"],
    ["Integration", "tests/test_integration.py", "15", "Services + repositories + SQLite: workflow, history, observer, lockout"],
    ["System", "tests/test_system.py", "13", "Full HTTP API: auth, end-to-end life cycle, RBAC, XSS/SQLi, headers, releases"]],
   [2.5, 4.5, 1.5, 8.5])
-H("10.2 Selected Test Cases", 2)
+H("11.2 Selected Test Cases", 2)
 T(["ID", "Description", "Input", "Expected", "Result"],
   [["UT-02", "Invalid transition", "NEW → CLOSED", "InvalidTransition raised", "Pass"],
    ["UT-07", "Priority boundary", "HIGH + blocks release", "P1", "Pass"],
@@ -479,21 +481,21 @@ T(["ID", "Description", "Input", "Expected", "Result"],
    ["ST-10", "Rate limit", "12 rapid logins", "429 returned", "Pass"],
    ["ST-11", "Release gate", "Ship with open CRITICAL", "409, then 200 after resolution", "Pass"]],
   [1.5, 4, 4, 5, 1.5])
-H("10.3 Test Results", 2)
+H("11.3 Test Results", 2)
 P("63 passed, 0 failed (python -m pytest -q). Manual exploratory testing of the UI was also performed on Chrome "
   "and Edge in light and dark mode at desktop and mobile widths.")
 BREAK()
 
 # =========================================================== 11 SQA
-H("11. Software Quality Assurance")
+H("12. Software Quality Assurance")
 T(["Quality attribute (ISO/IEC 25010)", "How it is achieved", "How it is measured"],
   [["Reliability", "Validation in services, DB constraints, error handler returning JSON 4xx", "Integration/system tests, no 500s in tests"],
    ["Maintainability", "Layered architecture, patterns, small modules, docstrings", "Module size, test coverage of core logic"],
-   ["Security", "See Section 9", "Security test cases (UT-10..14, IT-11/12/15, ST-02/06/08/09/10)"],
+   ["Security", "See Section 10", "Security test cases (UT-10..14, IT-11/12/15, ST-02/06/08/09/10)"],
    ["Usability", "Consistent UI, colour-coded badges, AI hints, toasts, dark mode, responsive", "Task: report a bug in ≤ 3 clicks"],
    ["Performance", "Indexes, SQL view, model trained once at start-up", "API timing; analyze() < 50 ms"],
    ["Functional suitability", "Requirements traceability (below)", "All FRs covered by tests"]], [4, 7, 6])
-H("11.1 Requirements Traceability Matrix", 2)
+H("12.1 Requirements Traceability Matrix", 2)
 T(["Requirement", "Design element", "Test case(s)"],
   [["FR-01 Register/login", "AuthService, TokenManager", "ST-03, UT-12"], ["FR-02 RBAC", "PERMISSIONS, @login_required", "UT-08, ST-06"],
    ["FR-04 AI severity", "BugIntelligence.predict_severity", "UT-19..21, UT-24"], ["FR-05 Priority", "derive_priority", "UT-07"],
@@ -501,7 +503,7 @@ T(["Requirement", "Design element", "Test case(s)"],
    ["FR-08 Life cycle", "BugStateMachine", "UT-01..06, IT-05/07, ST-05"], ["FR-09 Own bugs only", "BugService.change_status", "IT-06"],
    ["FR-11 Notifications", "NotificationListener", "IT-08, ST-13"], ["FR-12 Releases", "release_readiness, ship", "IT-10, ST-11"],
    ["FR-13 Search", "BugRepository.search", "ST-12, IT-15"], ["FR-15 Audit", "AuditListener", "IT-08"]], [5, 6, 6])
-H("11.2 Quality Practices", 2)
+H("12.2 Quality Practices", 2)
 B(["Coding standard: PEP 8, type hints, docstrings in every module.",
    "Version control with Git; feature branches and pull-request review between the two members.",
    "Definition of Done: code + tests passing + reviewed + documented.",
@@ -509,20 +511,20 @@ B(["Coding standard: PEP 8, type hints, docstrings in every module.",
 BREAK()
 
 # =========================================================== 12 PLANNING
-H("12. Project Planning and Management")
-H("12.1 Milestones", 2)
+H("13. Project Planning and Management")
+H("13.1 Milestones", 2)
 T(["Milestone", "Deliverable", "Date"],
   [["M0", "Project assigned, topic chosen", "31 Oct 2026"], ["M1", "Approved SRS and use cases", "2 Nov 2026"],
    ["M2", "Architecture, UML & DB design complete", "6 Nov 2026"],
    ["M3", "Feature-complete prototype + tests", "12 Nov 2026"], ["M4", "Final report, PPT, demo, submission", "15 Nov 2026"]], [3, 10, 4])
-H("12.2 Schedule (Gantt Chart)", 2)
+H("13.2 Schedule (Gantt Chart)", 2)
 IMG(os.path.join(DIA, "10_gantt.png"), "Figure 11 – Gantt chart")
-H("12.3 Work Breakdown and Responsibilities", 2)
+H("13.3 Work Breakdown and Responsibilities", 2)
 T(["Work package", "Anamika Chauhan", "Shreya Kumbar"],
   [["Requirements & SRS", "✔ (lead)", "✔"], ["UML diagrams", "✔", ""], ["Architecture & DB design", "", "✔"],
    ["Back-end (DB, services, API)", "", "✔"], ["Security", "", "✔"], ["AI / ML module", "✔", ""],
    ["Front-end UI", "✔", ""], ["Testing", "✔ (system)", "✔ (unit/integration)"], ["Report & PPT", "✔", "✔"]], [7, 5, 5])
-H("12.4 Effort Estimation (COCOMO – Basic, Organic)", 2)
+H("13.4 Effort Estimation (COCOMO – Basic, Organic)", 2)
 P("Size ≈ 2.2 KLOC (Python + JavaScript). Effort E = 2.4 × (2.2)^1.05 ≈ 5.6 person-months; "
   "Development time D = 2.5 × (5.6)^0.38 ≈ 4.8 months for a professional team. The estimate is higher than our "
   "16-day schedule because students worked part-time on a reduced scope, reused open-source libraries "
@@ -530,7 +532,7 @@ P("Size ≈ 2.2 KLOC (Python + JavaScript). Effort E = 2.4 × (2.2)^1.05 ≈ 5.6
 BREAK()
 
 # =========================================================== 13 RISK
-H("13. Risk Management")
+H("14. Risk Management")
 T(["Risk", "Probability", "Impact", "Mitigation"],
   [["Scope creep (too many features)", "High", "High", "Fixed FR list; extra ideas moved to Future Scope"],
    ["Low AI accuracy", "Medium", "Medium", "Hybrid rules, human override, measure agreement"],
@@ -540,26 +542,26 @@ T(["Risk", "Probability", "Impact", "Mitigation"],
 BREAK()
 
 # =========================================================== 14 MAINTENANCE
-H("14. Software Maintenance")
+H("15. Software Maintenance")
 T(["Type", "Example in NirBug"],
   [["Corrective", "Fix defects reported through NirBug itself (dog-fooding); regression tests added for every fix"],
    ["Adaptive", "Move from SQLite to PostgreSQL (only db.py changes); deploy in Docker / cloud"],
    ["Perfective", "Add e-mail/Slack notifications as a new EventBus listener; file attachments; Git commit linking"],
    ["Preventive", "Periodic dependency updates, retraining the ML model, refactoring, increasing test coverage"]], [3, 14])
-H("14.1 How the System Can Be Extended", 2)
+H("15.1 How the System Can Be Extended", 2)
 B(["New assignment algorithm → create a subclass of AssignmentStrategy and register it in STRATEGIES.",
    "New notification channel → subscribe a new listener to the EventBus; no service code changes.",
    "New workflow state → add one entry to BugStateMachine.TRANSITIONS and the Status enum.",
    "Better AI → add labelled rows (exported from closed bugs with human-corrected severity) and retrain; "
    "the evaluate() method reports the new accuracy before deployment.",
    "Mobile app → reuse the same REST API."])
-H("14.2 Maintenance Process", 2)
+H("15.2 Maintenance Process", 2)
 P("Change requests are themselves logged as issues in NirBug, prioritised by the manager, implemented on a "
   "branch, tested by the automated suite (all tests must pass), reviewed, and released with a new version number "
   "(semantic versioning MAJOR.MINOR.PATCH). The audit log and bug history support impact analysis.")
 
 # =========================================================== 15 CONCLUSION
-H("15. Conclusion and Future Scope")
+H("16. Conclusion and Future Scope")
 P("NirBug meets all the required features – bug reporting, severity classification, developer assignment, version "
   "tracking, testing status and release management – and adds AI-assisted triage, a Kanban board and analytics. "
   "More importantly, it was produced with a systematic SDLC: requirements were specified and traced, the system was "
