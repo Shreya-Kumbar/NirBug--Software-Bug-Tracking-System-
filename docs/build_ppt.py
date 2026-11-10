@@ -1,4 +1,4 @@
-"""Builds the presentation  ->  docs/BugSense_Presentation.pptx   (16:9, 18 slides)"""
+"""Builds the presentation  ->  docs/BugSense_Presentation.pptx   (16:9, 17 slides)"""
 import os
 
 from pptx import Presentation
@@ -157,16 +157,8 @@ bullets(s, ["Severity classifier:|TF-IDF (word + char n-grams) → Logistic Regr
             "Human-in-the-loop:|user can override; AI/human agreement shown on dashboard",
             "Evaluation:|stratified 5-fold cross-validation, beats random baseline; improves as data grows"], size=18)
 
-# 14 Screens
-s = slide("Implementation – Screens", 14)
-shots = ["02_dashboard.jpg", "04_board.jpg", "05_report_bug_ai.jpg", "06_bug_detail.jpg"]
-for i, f in enumerate(shots):
-    p = os.path.join(SHOT, f)
-    if os.path.exists(p):
-        s.shapes.add_picture(p, Inches(0.5 + (i % 2) * 6.3), Inches(1.4 + (i // 2) * 3.0), width=Inches(6.0))
-
 # 15 Security + Testing
-s = slide("Security & Testing", 15)
+s = slide("Security & Testing", 14)
 text(s, Inches(0.6), Inches(1.4), Inches(6), Inches(0.5), "Security (STRIDE)", 22, True, INDIGO)
 bullets(s, ["PBKDF2-SHA256 salted hashes", "HMAC-signed expiring tokens", "RBAC on every endpoint", "Lockout after 5 failures",
             "Rate limiting (429)", "SQLi: parameterised queries", "XSS: escaping + CSP", "Audit log with IP"], x=0.6, y=2.0, w=6, size=16)
@@ -176,13 +168,13 @@ bullets(s, ["Unit:|state machine, rules, security, AI", "Integration:|services +
             "Traceability matrix FR → test"], x=7, y=2.0, w=6, size=16)
 
 # 16 Planning
-s = slide("Project Planning", 16)
+s = slide("Project Planning", 15)
 image(s, os.path.join(DIA, "10_gantt.png"), y=1.3, h=4.4)
 bullets(s, ["Member 1:|requirements, UML, AI, front-end      Member 2:|architecture, DB, back-end, security, tests"],
         y=5.9, size=16)
 
 # 17 Maintenance & conclusion
-s = slide("Maintenance, Future Scope & Conclusion", 17)
+s = slide("Maintenance, Future Scope & Conclusion", 16)
 bullets(s, ["Corrective:|regression test for every fix", "Adaptive:|SQLite → PostgreSQL by changing only db.py; Docker/cloud",
             "Perfective:|e-mail/Slack listener, attachments, Git/CI integration",
             "Preventive:|retrain ML on real data, dependency updates, refactoring",

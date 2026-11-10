@@ -356,12 +356,6 @@ H("7.4 Key Algorithm – Skill-based Auto-assignment", 2)
 P("For every developer d:  score(d) = 10 × [bug.component ∈ d.skills] − load(d),  where load(d) = Σ severity weight "
   "(CRITICAL 4, HIGH 3, MEDIUM 2, LOW 1) of d's open bugs. The developer with the highest score is chosen. This "
   "balances expertise and workload. Complexity: O(n) in the number of developers.")
-H("7.5 Screenshots", 2)
-for f, c in [("01_login.jpg", "Login screen with demo accounts"), ("02_dashboard.jpg", "Dashboard with analytics"),
-             ("03_bug_list.jpg", "Bug list with filters"), ("04_board.jpg", "Kanban board (drag-and-drop status)"),
-             ("05_report_bug_ai.jpg", "Report bug with live AI triage and duplicate detection"),
-             ("06_bug_detail.jpg", "Bug detail: comments, history, allowed transitions")]:
-    IMG(os.path.join(SHOT, f), "Screenshot – " + c, 15)
 BREAK()
 
 # =========================================================== 8 AI
