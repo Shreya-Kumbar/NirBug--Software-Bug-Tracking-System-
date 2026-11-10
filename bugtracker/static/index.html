@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BugSense – Bug Tracking System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: { brand: { 50:'#eef2ff',100:'#e0e7ff',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca' } } } }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/effects.css">
+</head>
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200 font-sans antialiased">
+
+<!-- ================= AUTH SCREEN ================= -->
+<section id="auth-screen" class="hidden min-h-full hero-anim relative overflow-hidden text-white">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="grid-overlay"></div>
+  <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+  <div class="relative z-10 min-h-screen grid lg:grid-cols-2">
+  <div class="hidden lg:flex flex-col justify-between p-12">
+    <div class="flex items-center gap-3 text-2xl font-extrabold reveal"><span class="float-bug"><i data-lucide="bug" class="w-8 h-8"></i></span> BugSense</div>
+    <div>
+      <span class="reveal d1 inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-semibold mb-6"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>AI-powered issue tracking</span>
+      <h1 class="text-5xl xl:text-6xl font-extrabold leading-[1.08] reveal d1">Track, triage<br>and ship <span class="grad-text whitespace-nowrap">bug-free</span><br>releases.</h1>
+      <p class="mt-6 text-lg text-indigo-100 max-w-md reveal d2">AI-assisted severity prediction, duplicate detection, smart developer assignment and release readiness – all in one place.</p>
+      <div class="mt-10 grid grid-cols-3 gap-4 max-w-md reveal d3">
+        <div class="glass p-4 rounded-2xl tilt"><i data-lucide="brain" class="w-6 h-6"></i><p class="mt-2 text-sm font-semibold">ML Triage</p></div>
+        <div class="glass p-4 rounded-2xl tilt"><i data-lucide="shield-check" class="w-6 h-6"></i><p class="mt-2 text-sm font-semibold">RBAC Security</p></div>
+        <div class="glass p-4 rounded-2xl tilt"><i data-lucide="rocket" class="w-6 h-6"></i><p class="mt-2 text-sm font-semibold">Releases</p></div>
+      </div>
+    </div>
+    <p class="text-sm text-indigo-200 reveal d4">Software Engineering Project · 2026</p>
+  </div>
+  <div class="flex items-center justify-center p-6">
+    <div class="w-full max-w-md glass-card p-8 sm:p-10 reveal d2 tilt" id="login-card">
+      <div class="lg:hidden flex items-center gap-2 text-2xl font-extrabold mb-8"><span class="float-bug"><i data-lucide="bug"></i></span> BugSense</div>
+      <h2 id="auth-title" class="text-3xl font-bold">Welcome back 👋</h2>
+      <p id="auth-sub" class="text-indigo-100 mt-1">Sign in to your workspace</p>
+      <form id="auth-form" class="mt-8 space-y-4">
+        <div><label class="lbl">Username</label><input name="username" class="inp" required autocomplete="username"></div>
+        <div id="email-row" class="hidden"><label class="lbl">E-mail</label><input name="email" type="email" class="inp"></div>
+        <div><label class="lbl">Password</label><input name="password" type="password" class="inp" required autocomplete="current-password"></div>
+        <p id="auth-error" class="text-sm text-rose-200 bg-rose-500/30 rounded-lg px-3 py-2 hidden"></p>
+        <button class="btn-primary w-full py-3 text-base" id="auth-btn">Sign in</button>
+      </form>
+      <p class="text-sm text-indigo-100 mt-6 text-center"><span id="auth-switch-text">No account?</span>
+        <a href="#" id="auth-switch" class="text-white font-bold underline decoration-fuchsia-300 underline-offset-4">Create one</a></p>
+      <div class="mt-8 p-4 rounded-xl bg-white/10 border border-white/15 text-sm">
+        <p class="font-semibold mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i>Demo accounts (password <code>Demo@1234</code>)</p>
+        <div class="flex flex-wrap gap-2" id="demo-users"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ================= APP SHELL ================= -->
+<section id="app-screen" class="hidden h-full flex">
+  <div class="app-aurora"><span></span><span></span><span></span></div>
+  <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 -translate-x-full lg:translate-x-0 transition bg-slate-900 text-slate-300 flex flex-col">
+    <div class="h-16 flex items-center gap-2 px-6 text-white text-xl font-extrabold"><i data-lucide="bug" class="text-brand-400"></i>BugSense</div>
+    <nav class="flex-1 px-3 space-y-1" id="nav">
+      <a data-view="dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a data-view="bugs" class="nav-link"><i data-lucide="list-checks"></i>All Bugs</a>
+      <a data-view="board" class="nav-link"><i data-lucide="kanban"></i>Board</a>
+      <a data-view="mine" class="nav-link"><i data-lucide="user-check"></i>My Work</a>
+      <a data-view="releases" class="nav-link"><i data-lucide="rocket"></i>Releases</a>
+      <a data-view="team" class="nav-link" data-perm="assign"><i data-lucide="users"></i>Team</a>
+      <a data-view="audit" class="nav-link" data-perm="audit"><i data-lucide="scroll-text"></i>Audit Log</a>
+    </nav>
+    <div class="p-4 border-t border-slate-800">
+      <div class="flex items-center gap-3">
+        <div id="me-avatar" class="avatar"></div>
+        <div class="flex-1 min-w-0"><p id="me-name" class="text-white font-semibold truncate"></p><p id="me-role" class="text-xs text-slate-400"></p></div>
+        <button id="logout" title="Log out" class="p-2 rounded-lg hover:bg-slate-800"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="glass-head h-16 flex items-center gap-3 px-4 lg:px-8 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+      <button id="menu-btn" class="lg:hidden p-2"><i data-lucide="menu"></i></button>
+      <h1 id="view-title" class="text-lg font-bold flex-1">Dashboard</h1>
+      <div class="relative hidden md:block">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+        <input id="global-search" placeholder="Search bugs…" class="inp pl-9 w-64 py-2">
+      </div>
+      <button id="theme-btn" class="icon-btn" title="Toggle theme"><i data-lucide="moon"></i></button>
+      <div class="relative">
+        <button id="notif-btn" class="icon-btn"><i data-lucide="bell"></i><span id="notif-dot" class="hidden absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500"></span></button>
+        <div id="notif-panel" class="hidden absolute right-0 mt-2 w-80 card p-2 max-h-96 overflow-auto z-50"></div>
+      </div>
+      <button id="new-bug-btn" class="btn-primary"><i data-lucide="plus" class="w-4 h-4"></i><span class="hidden sm:inline">Report Bug</span></button>
+    </header>
+    <main id="view" class="flex-1 overflow-auto p-4 lg:p-8"></main>
+  </div>
+</section>
+
+<!-- ================= MODAL ================= -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto">
+  <div id="modal-body" class="card w-full max-w-3xl mt-10 p-6 relative fade-in"></div>
+</div>
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-xl shadow-lg text-white"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
