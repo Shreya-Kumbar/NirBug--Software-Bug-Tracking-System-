@@ -362,27 +362,35 @@ def deployment():
 
 # ------------------------------------------------------------------ 10. GANTT
 def gantt():
-    tasks = [("Requirement gathering & SRS", 0, 7, "Both"), ("Use-case & domain modelling", 5, 6, "Member 1"),
-             ("Architecture & DB design", 8, 6, "Member 2"), ("UML diagrams", 10, 6, "Member 1"),
-             ("Backend: DB + repositories", 14, 7, "Member 2"), ("Backend: services + security", 17, 8, "Member 2"),
-             ("AI module (ML)", 20, 7, "Member 1"), ("Frontend SPA", 21, 10, "Member 1"),
-             ("Unit + integration tests", 26, 7, "Member 2"), ("System testing & bug fixing", 31, 5, "Both"),
-             ("Report, PPT & demo", 33, 7, "Both")]
+    # Project window: 31 Oct 2026 (day 0) -> 15 Nov 2026 (day 15) = 16 days.
+    # (task, start day, duration in days, owner)
+    tasks = [("Requirement gathering & SRS", 0, 3, "Both"), ("Use-case & domain modelling", 2, 2, "Member 1"),
+             ("Architecture & DB design", 3, 2, "Member 2"), ("UML diagrams", 4, 3, "Member 1"),
+             ("Backend: DB + repositories", 5, 3, "Member 2"), ("Backend: services + security", 7, 3, "Member 2"),
+             ("AI module (ML)", 7, 3, "Member 1"), ("Frontend (web UI)", 8, 4, "Member 1"),
+             ("Unit + integration tests", 10, 3, "Member 2"), ("System testing & bug fixing", 12, 2, "Both"),
+             ("Report, PPT & demo", 13, 3, "Both")]
     colors = {"Member 1": "#6366f1", "Member 2": "#ec4899", "Both": "#10b981"}
+    import datetime as _dt
+    start = _dt.date(2026, 10, 31)
     fig, ax = plt.subplots(figsize=(12, 5.5))
     for i, (t, s, d, who) in enumerate(tasks):
         ax.barh(i, d, left=s, color=colors[who], edgecolor=INK, height=0.6)
-        ax.text(s + d + 0.3, i, who, va="center", fontsize=8)
+        ax.text(s + d + 0.15, i, who, va="center", fontsize=8)
     ax.set_yticks(range(len(tasks)))
     ax.set_yticklabels([t[0] for t in tasks])
     ax.invert_yaxis()
-    ax.set_xlabel("Days from project start")
-    ax.set_xlim(0, 44)
-    for m, d in [("M1 SRS sign-off", 7), ("M2 Design done", 16), ("M3 Feature complete", 31), ("M4 Submission", 40)]:
+    ax.set_xlim(0, 17.2)
+    ax.set_xticks([i + 0.5 for i in range(16)])      # one label in the middle of each day
+    ax.set_xticklabels([(start + _dt.timedelta(days=i)).strftime("%d\n%b") for i in range(16)], fontsize=8)
+    ax.tick_params(axis="x", length=0)
+    for i in range(17):
+        ax.axvline(i, color="#e2e8f0", lw=0.6, zorder=0)
+    ax.set_xlabel("Date (2026)")
+    for m, d in [("M1 SRS sign-off", 3), ("M2 Design done", 7), ("M3 Feature complete", 13), ("M4 Submission", 16)]:
         ax.axvline(d, color="#f59e0b", ls="--", lw=1)
         ax.text(d, -1, m, rotation=0, fontsize=7.5, ha="center", color="#b45309")
-    ax.set_title("Project Schedule – Gantt Chart (6 weeks)", fontsize=14, fontweight="bold", pad=20)
-    ax.grid(axis="x", alpha=.3)
+    ax.set_title("Project Schedule – Gantt Chart (31 Oct – 15 Nov 2026, 16 days)", fontsize=14, fontweight="bold", pad=20)
     save(fig, "10_gantt.png")
 
 
@@ -400,6 +408,46 @@ def component():
     save(fig, "11_component.png")
 
 
+# ------------------------------------------------------------------ 12. SDLC MODEL
+def sdlc():
+    import math
+    fig, ax = canvas(14, 7.5, "SDLC Model – Iterative Incremental (Agile / Scrum-based)")
+    # left: the cycle every sprint goes through
+    cx, cy, r, ry = 34, 36, 27, 25
+    phases = ["1. Plan &\nRequirements", "2. Analysis", "3. Design", "4. Implement", "5. Test", "6. Review &\nDeliver"]
+    cols = [BLUE, PURPLE, "#e0f2fe", GREEN, ORANGE, "#fce7f3"]
+    pts = []
+    for i, (p, c) in enumerate(zip(phases, cols)):
+        a = math.pi / 2 - i * 2 * math.pi / len(phases)
+        x, y = cx + r * math.cos(a), cy + ry * math.sin(a)
+        pts.append((x, y))
+        box(ax, x - 8, y - 4.5, 16, 9, p, c, fs=8, bold=True)
+    for i in range(len(pts)):
+        (x1, y1), (x2, y2) = pts[i], pts[(i + 1) % len(pts)]
+        dx, dy = x2 - x1, y2 - y1
+        # fraction of the segment that lies inside a 18x9 box -> start/end exactly at the box edge
+        k = min(8.8 / abs(dx) if dx else 1e9, 5.1 / abs(dy) if dy else 1e9)
+        arrow(ax, (x1 + dx * k, y1 + dy * k), (x2 - dx * k, y2 - dy * k), rad=-0.15)
+    ax.text(cx, cy + 1.5, "repeated\nevery sprint", ha="center", va="center", fontsize=9, style="italic", color="#475569")
+    ax.text(cx, cy - 4, "↻", ha="center", va="center", fontsize=22, color="#6366f1")
+
+    # right: the three increments on the real timeline
+    sprints = [("Sprint 1", "31 Oct – 4 Nov", "Requirements & SRS, use cases,\narchitecture, DB schema, login/auth", BLUE),
+               ("Sprint 2", "5 – 9 Nov", "Bug workflow & state machine,\nassignment strategies, AI module, API", PURPLE),
+               ("Sprint 3", "10 – 15 Nov", "Web UI, releases, dashboard,\nall testing, report & PPT", GREEN)]
+    for i, (n, d, w, c) in enumerate(sprints):
+        y = 58 - i * 20
+        box(ax, 72, y, 62, 15, "", c)
+        ax.text(75, y + 11, f"{n}  ·  {d}", fontsize=10, fontweight="bold", color=INK)
+        ax.text(75, y + 3.2, w, fontsize=8.5, color=INK)
+        ax.text(131, y + 11, f"Increment {i + 1}", fontsize=8, ha="right", color="#475569", style="italic")
+        if i < 2:
+            arrow(ax, (103, y), (103, y - 5))
+    ax.text(103, 9, "Each sprint ends with a working, tested increment + review with the team",
+            ha="center", fontsize=8.5, style="italic", color="#475569")
+    save(fig, "12_sdlc.png")
+
+
 if __name__ == "__main__":
-    for f in (use_case, class_diagram, sequence, activity, state, er, architecture, dfd, deployment, gantt, component):
+    for f in (use_case, class_diagram, sequence, activity, state, er, architecture, dfd, deployment, gantt, component, sdlc):
         f()

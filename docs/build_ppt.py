@@ -1,4 +1,4 @@
-"""Builds the presentation  ->  docs/BugSense_Presentation.pptx   (16:9, 17 slides)"""
+"""Builds the presentation  ->  docs/BugSense_Presentation.pptx   (16:9, 18 slides)"""
 import os
 
 from pptx import Presentation
@@ -43,7 +43,7 @@ def slide(title, n):
     rect(s, 0, 0, W, Inches(1.1), INDIGO)
     rect(s, 0, Inches(1.1), W, Inches(0.06), PURPLE)
     text(s, Inches(0.5), Inches(0.22), Inches(11), Inches(0.8), title, 30, True, WHITE)
-    text(s, Inches(12.2), Inches(7.0), Inches(1), Inches(0.4), str(n), 12, color=RGBColor(0x94, 0xA3, 0xB8))
+    text(s, Inches(12.2), Inches(7.0), Inches(1), Inches(0.4), str(len(prs.slides)), 12, color=RGBColor(0x94, 0xA3, 0xB8))
     return s
 
 
@@ -107,16 +107,22 @@ for i, (h, d) in enumerate(feats):
     text(s, x + Inches(0.2), y + Inches(1.0), Inches(2.6), Inches(1.3), d, 14)
 
 # 4 SDLC
-s = slide("SDLC Model – Iterative Incremental (Agile)", 4)
-for i, (h, d) in enumerate([("Sprint 1", "Requirements, SRS, design,\nDB schema, authentication"),
-                            ("Sprint 2", "Bug workflow, state machine,\nassignment, AI module"),
-                            ("Sprint 3", "Front-end, releases, analytics,\ntesting, documentation")]):
-    x = Inches(0.6 + i * 4.2)
-    rect(s, x, Inches(1.8), Inches(3.8), Inches(2.6), LIGHT, MSO_SHAPE.ROUNDED_RECTANGLE)
-    text(s, x + Inches(0.3), Inches(2.0), Inches(3.3), Inches(0.6), h, 24, True, INDIGO)
-    text(s, x + Inches(0.3), Inches(2.8), Inches(3.3), Inches(1.5), d, 16)
-bullets(s, ["Why:|working increment early, requirements refined after feedback, suits a 2-person team",
-            "Why not Waterfall:|no room for change after design (AI features evolved)"], y=4.9, size=18)
+s = slide("SDLC Model – Iterative Incremental (Agile / Scrum)", 4)
+image(s, os.path.join(DIA, "12_sdlc.png"), y=1.35, h=5.7)
+
+s = slide("SDLC Phases & Why This Model", 4)
+phases = [("1. Plan & Requirements", "Problem, scope, SRS, schedule"), ("2. Analysis", "Stakeholders, use cases, feasibility"),
+          ("3. Design", "Architecture, UML, ER diagram, patterns"), ("4. Implementation", "Flask back-end, DB, AI, web UI"),
+          ("5. Testing", "63 unit / integration / system tests"), ("6. Review & Deploy", "Demo each sprint, plan the next"),
+          ("7. Maintenance", "Fix, adapt, extend after delivery")]
+for i, (h, d) in enumerate(phases):
+    x, y = Inches(0.5 + (i % 4) * 3.15), Inches(1.45 + (i // 4) * 1.55)
+    rect(s, x, y, Inches(2.95), Inches(1.35), LIGHT, MSO_SHAPE.ROUNDED_RECTANGLE)
+    text(s, x + Inches(0.15), y + Inches(0.12), Inches(2.7), Inches(0.5), h, 15, True, INDIGO)
+    text(s, x + Inches(0.15), y + Inches(0.6), Inches(2.7), Inches(0.7), d, 12)
+bullets(s, ["Why Iterative Incremental:|16-day deadline, 2-person team, changing requirements, working product after every sprint",
+            "Why not Waterfall:|no going back after design; nothing works until the end",
+            "Why not Spiral:|too heavy (risk-driven) for a small project"], y=4.75, size=16)
 
 # 5 SRS
 s = slide("Requirements (SRS – IEEE 830)", 5)
@@ -170,7 +176,7 @@ bullets(s, ["Unit:|state machine, rules, security, AI", "Integration:|services +
 # 16 Planning
 s = slide("Project Planning", 15)
 image(s, os.path.join(DIA, "10_gantt.png"), y=1.3, h=4.4)
-bullets(s, ["Member 1:|requirements, UML, AI, front-end      Member 2:|architecture, DB, back-end, security, tests"],
+bullets(s, ["Member 1:|requirements, UML, AI module, front-end", "Member 2:|architecture, database, back-end, security, testing"],
         y=5.9, size=16)
 
 # 17 Maintenance & conclusion

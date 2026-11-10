@@ -152,13 +152,56 @@ H("1.4 Scope", 2)
 P("In scope: multi-project bug tracking, five user roles, AI triage, assignment, comments, history, notifications, "
   "releases, dashboard analytics, audit log, REST API and a responsive web UI. Out of scope (future work): e-mail "
   "delivery, Git/CI integration, file attachments and multi-tenant SaaS hosting.")
-H("1.5 SDLC Model Used – Iterative Incremental (Agile-Scrum inspired)", 2)
-P("We followed an iterative incremental model with three 2-week sprints. Each sprint delivered a working "
-  "increment (Sprint 1: requirements, design, database and authentication; Sprint 2: bug workflow, assignment, AI; "
-  "Sprint 3: front-end, releases, analytics, testing and documentation). This model was chosen because "
-  "requirements (e.g. the AI features) were refined after early feedback, a two-person team benefits from short "
-  "feedback loops, and risk is reduced by having a working product early. A pure Waterfall model was rejected "
-  "because it does not allow requirement changes after the design phase.")
+H("1.5 Software Development Life Cycle (SDLC)", 2)
+P("The SDLC is the structured sequence of phases a software product goes through, from the first idea to "
+  "maintenance. For BugSense we used the Iterative Incremental model, run in an Agile / Scrum style.")
+H("1.5.1 Model Chosen: Iterative Incremental (Agile / Scrum-based)", 3)
+P("The whole system is not built in one go. It is divided into small increments, and each increment is developed in a "
+  "short time-box called a sprint. Every sprint goes through all the SDLC phases (plan, analyse, design, implement, "
+  "test, review), so at the end of every sprint there is a working, tested part of the product. The next sprint "
+  "adds more features on top of it (incremental) and improves what already exists using feedback (iterative).")
+IMG(os.path.join(DIA, "12_sdlc.png"), "Figure 0 – SDLC model: each sprint runs the full cycle and adds one increment")
+H("1.5.2 Phases of the Life Cycle (as applied in BugSense)", 3)
+T(["Phase", "What happens", "Output / artefact in this project"],
+  [["1. Planning & Requirements", "Understand the problem, identify users and features, fix scope and schedule",
+    "Problem statement, SRS (Section 2), Gantt chart, risk table"],
+   ["2. Analysis", "Study stakeholders, use cases, feasibility; refine and prioritise requirements",
+    "Stakeholder list, use-case diagram & descriptions, feasibility study (Section 3)"],
+   ["3. Design", "Decide architecture, modules, database and UI; model the system with UML",
+    "Layered architecture, class/sequence/activity/state diagrams, ER diagram, design patterns (Sections 4–6)"],
+   ["4. Implementation (Coding)", "Write the code module by module following the design",
+    "Flask back-end, SQLite DB, AI module, web front-end (Sections 7–9)"],
+   ["5. Testing", "Verify each part and the whole system against the requirements",
+    "63 automated unit, integration and system tests, traceability matrix (Sections 10–11)"],
+   ["6. Deployment & Review", "Run the increment, demo it, collect feedback, plan the next sprint",
+    "Working increment at the end of each sprint, final demo on 15 Nov"],
+   ["7. Maintenance", "Fix, adapt and improve the system after delivery",
+    "Maintenance plan (Section 14)"]], [3.6, 6.4, 7])
+H("1.5.3 Sprints (Increments) on Our Timeline", 3)
+T(["Sprint", "Dates", "Increment delivered", "Phases covered"],
+  [["Sprint 1", "31 Oct – 4 Nov 2026", "SRS, use cases, architecture, DB schema, login & registration",
+    "Planning, Analysis, Design, first Implementation + tests"],
+   ["Sprint 2", "5 – 9 Nov 2026", "Bug life cycle (state machine), assignment strategies, AI module, REST API",
+    "Design refinement, Implementation, unit & integration tests"],
+   ["Sprint 3", "10 – 15 Nov 2026", "Web UI, releases, dashboard, notifications, audit log, report & PPT",
+    "Implementation, system testing, review, deployment/demo"]], [2.2, 3.6, 6.6, 4.6])
+P("Scrum practices we followed (scaled down for a two-person team): a product backlog (the list of functional "
+  "requirements FR-01 to FR-16), sprint planning at the start of each sprint, short daily check-ins between the "
+  "two members, and a sprint review/demo at the end of each sprint where the increment was tested and the next "
+  "sprint was planned.")
+H("1.5.4 Why This Model? (Comparison with Other SDLC Models)", 3)
+T(["Model", "How it works", "Suitable for BugSense?"],
+  [["Waterfall", "Phases done once, strictly one after another; no going back", "No – requirements (e.g. AI features, UI) changed during the project; nothing works until the very end"],
+   ["V-Model", "Waterfall with a test phase planned for each development phase", "Partly – good testing discipline (we borrowed this idea), but still rigid"],
+   ["Spiral", "Iterations driven by risk analysis; suited to large, high-risk projects", "No – too heavy for a 16-day student project"],
+   ["Prototype", "Build a throw-away prototype to discover requirements", "Partly – we used a quick UI prototype for the report-bug flow"],
+   ["Iterative Incremental (Agile/Scrum) ✔", "Small time-boxed sprints, each delivers a working increment",
+    "Yes – short deadline, small team, changing requirements, early working product, continuous testing"]], [3.4, 6, 7.6])
+H("1.5.5 Advantages Observed", 3)
+B(["A working version existed after Sprint 1, so the risk of having nothing to submit was low.",
+   "Requirement changes (e.g. adding duplicate detection and release readiness) were absorbed in the next sprint.",
+   "Testing happened in every sprint, so bugs were found early and cheaply.",
+   "Work was divided clearly between the two members per sprint, making progress easy to track."])
 BREAK()
 
 # =========================================================== 2 SRS
@@ -202,7 +245,7 @@ T(["ID", "Category", "Requirement"],
    ["NFR-09", "Accountability", "Every create/assign/status change is written to bug_history and audit_log with timestamp and actor."],
    ["NFR-10", "Availability", "Stateless API (token auth) so it can be scaled horizontally behind a load balancer."]], [1.8, 2.7, 12])
 H("2.4 Constraints and Assumptions", 2)
-B(["Development time of ~6 weeks and a team of 2 students.",
+B(["Development time of 16 days (31 Oct – 15 Nov 2026) and a team of 2 students.",
    "Free/open-source technologies only (Python, Flask, SQLite, scikit-learn).",
    "The AI model is trained on a small labelled dataset; humans can always override its prediction.",
    "Users access the system with a modern browser (Chrome, Edge, Firefox, Safari)."])
@@ -468,9 +511,10 @@ BREAK()
 # =========================================================== 12 PLANNING
 H("12. Project Planning and Management")
 H("12.1 Milestones", 2)
-T(["Milestone", "Deliverable", "Day"],
-  [["M1", "Approved SRS and use cases", "7"], ["M2", "Architecture, UML & DB design complete", "16"],
-   ["M3", "Feature-complete prototype + tests", "31"], ["M4", "Final report, PPT, demo, submission", "40"]], [3, 10, 3])
+T(["Milestone", "Deliverable", "Date"],
+  [["M0", "Project assigned, topic chosen", "31 Oct 2026"], ["M1", "Approved SRS and use cases", "2 Nov 2026"],
+   ["M2", "Architecture, UML & DB design complete", "6 Nov 2026"],
+   ["M3", "Feature-complete prototype + tests", "12 Nov 2026"], ["M4", "Final report, PPT, demo, submission", "15 Nov 2026"]], [3, 10, 4])
 H("12.2 Schedule (Gantt Chart)", 2)
 IMG(os.path.join(DIA, "10_gantt.png"), "Figure 11 – Gantt chart")
 H("12.3 Work Breakdown and Responsibilities", 2)
@@ -481,7 +525,7 @@ T(["Work package", "Member 1", "Member 2"],
 H("12.4 Effort Estimation (COCOMO – Basic, Organic)", 2)
 P("Size ≈ 2.2 KLOC (Python + JavaScript). Effort E = 2.4 × (2.2)^1.05 ≈ 5.6 person-months; "
   "Development time D = 2.5 × (5.6)^0.38 ≈ 4.8 months for a professional team. The estimate is higher than our "
-  "6-week schedule because students worked part-time on a reduced scope, reused open-source libraries "
+  "16-day schedule because students worked part-time on a reduced scope, reused open-source libraries "
   "heavily and generated documentation from code; the estimate is shown to demonstrate the technique.")
 BREAK()
 
