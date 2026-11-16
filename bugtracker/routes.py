@@ -89,6 +89,30 @@ def create_user():
                                        d.get("role", "REPORTER"), d.get("skills", ""), by_admin=True)), 201
 
 
+@api.patch("/users/<int:uid>")
+@login_required("manage_users")
+def update_user(uid):
+    """Admin changes a member's role and/or skills."""
+    d = body()
+    row = svc().users.get(uid)
+    if not row:
+        raise ServiceError("User not found", 404)
+    changes = {}
+    if "role" in d:
+        if d["role"] not in ("ADMIN", "MANAGER", "DEVELOPER", "TESTER", "REPORTER"):
+            raise ServiceError("Invalid role")
+        if uid == g.user.id and d["role"] != "ADMIN":
+            raise ServiceError("You cannot remove your own admin role")
+        changes["role"] = d["role"]
+    if "skills" in d:
+        changes["skills"] = str(d["skills"])[:200]
+    svc().users.update(uid, **changes)
+    svc().events.publish("user.updated", actor_id=g.user.id, detail=f"{row['username']} {changes}",
+                         notify=[uid], message=f"Your account was updated by {g.user.username}")
+    u = svc().users.get(uid)
+    return jsonify({k: u[k] for k in ("id", "username", "email", "role", "skills")})
+
+
 # ------------------------------------------------------------------ projects & releases
 @api.get("/projects")
 @login_required()
@@ -150,8 +174,10 @@ def ship_release(rid):
 def list_bugs():
     a = request.args
     assignee = g.user.id if a.get("mine") == "1" else a.get("assignee_id")
+    reporter = g.user.id if a.get("reported") == "1" else None
+    statuses = [s for s in (a.get("statuses") or "").split(",") if s] or None
     return jsonify(svc().bugs.search(a.get("status"), a.get("severity"), a.get("project_id"),
-                                     assignee, a.get("q")))
+                                     assignee, a.get("q"), reporter_id=reporter, statuses=statuses))
 
 
 @api.post("/bugs/analyze")

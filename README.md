@@ -22,7 +22,7 @@ Open http://127.0.0.1:5000 — demo accounts `admin`, `manager`, `dev_alice`, `d
 
 ## Test
 ```bash
-python -m pytest -v        # 63 unit, integration and system tests
+python -m pytest -v        # 65 unit, integration and system tests
 ```
 
 ## Documents

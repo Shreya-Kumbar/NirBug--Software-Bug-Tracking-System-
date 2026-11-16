@@ -73,8 +73,21 @@ function logout() { sessionStorage.removeItem('token'); state.token = null; loca
 $('#logout').onclick = logout;
 
 // ------------------------------------------------------------------ shell / routing
-const VIEWS = { dashboard: 'Dashboard', bugs: 'All Bugs', board: 'Board', mine: 'My Work', releases: 'Releases', team: 'Team', audit: 'Audit Log' };
-$$('.nav-link').forEach(a => a.onclick = () => { location.hash = a.dataset.view; $('#sidebar').classList.add('-translate-x-full'); });
+const VIEWS = { dashboard: 'Dashboard', triage: 'Triage & Assign', work: 'My Work', qa: 'QA Queue', reports: 'My Reports',
+  bugs: 'All Bugs', board: 'Board', releases: 'Releases', team: 'Team', audit: 'Audit Log' };
+// Each role sees its own menu (first entry = home page after login)
+const NAV = {
+  REPORTER:  [['reports', 'file-text', 'My Reports'], ['bugs', 'list-checks', 'All Bugs'], ['releases', 'rocket', 'Releases']],
+  DEVELOPER: [['work', 'wrench', 'My Work'], ['board', 'kanban', 'Board'], ['bugs', 'list-checks', 'All Bugs'], ['releases', 'rocket', 'Releases']],
+  TESTER:    [['qa', 'flask-conical', 'QA Queue'], ['board', 'kanban', 'Board'], ['bugs', 'list-checks', 'All Bugs'], ['reports', 'file-text', 'My Reports'], ['releases', 'rocket', 'Releases']],
+  MANAGER:   [['dashboard', 'layout-dashboard', 'Dashboard'], ['triage', 'user-plus', 'Triage & Assign'], ['board', 'kanban', 'Board'], ['bugs', 'list-checks', 'All Bugs'], ['releases', 'rocket', 'Releases'], ['team', 'users', 'Team'], ['audit', 'scroll-text', 'Audit Log']],
+  ADMIN:     [['dashboard', 'layout-dashboard', 'Dashboard'], ['team', 'users', 'Users & Roles'], ['triage', 'user-plus', 'Triage & Assign'], ['board', 'kanban', 'Board'], ['bugs', 'list-checks', 'All Bugs'], ['releases', 'rocket', 'Releases'], ['audit', 'scroll-text', 'Audit Log']],
+};
+const myNav = () => NAV[state.user?.role] || NAV.REPORTER;
+function buildNav() {
+  $('#nav').innerHTML = myNav().map(([v, ic, label]) => `<a data-view="${v}" class="nav-link"><i data-lucide="${ic}"></i>${label}</a>`).join('');
+  $$('.nav-link').forEach(a => a.onclick = () => { location.hash = a.dataset.view; $('#sidebar').classList.add('-translate-x-full'); });
+}
 $('#menu-btn').onclick = () => $('#sidebar').classList.toggle('-translate-x-full');
 window.onhashchange = route;
 $('#new-bug-btn').onclick = openNewBug;
@@ -87,19 +100,20 @@ async function boot() {
   $('#auth-screen').classList.add('hidden'); $('#app-screen').classList.remove('hidden');
   $('#me-name').textContent = state.user.username; $('#me-role').textContent = state.user.role;
   $('#me-avatar').innerHTML = initials(state.user.username);
-  $$('[data-perm]').forEach(a => a.classList.toggle('hidden',
-    a.dataset.perm === 'assign' ? !isMgr() : !isMgr()));
+  buildNav();
   loadNotifications(); setInterval(loadNotifications, 30000);
   route();
 }
 function route() {
-  const v = (location.hash || '#dashboard').slice(1);
-  const view = VIEWS[v] ? v : 'dashboard';
-  $('#view-title').textContent = VIEWS[view];
+  const allowed = myNav().map(n => n[0]);
+  const v = (location.hash || '').slice(1);
+  const view = allowed.includes(v) ? v : allowed[0];   // unknown / not-allowed page -> role's home page
+  $('#view-title').textContent = myNav().find(n => n[0] === view)[2];
   $$('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.view === view));
   state.charts.forEach(c => c.destroy()); state.charts = [];
   $('#view').innerHTML = '<div class="space-y-4"><div class="skeleton h-28"></div><div class="grid grid-cols-2 xl:grid-cols-4 gap-4"><div class="skeleton h-24"></div><div class="skeleton h-24"></div><div class="skeleton h-24"></div><div class="skeleton h-24"></div></div><div class="skeleton h-64"></div></div>';
-  ({ dashboard: viewDashboard, bugs: () => viewBugs(false), mine: () => viewBugs(true), board: viewBoard,
+  ({ dashboard: viewDashboard, triage: viewTriage, work: viewWork, qa: viewQA, reports: viewReports,
+     bugs: () => viewBugs(false), board: viewBoard,
      releases: viewReleases, team: viewTeam, audit: viewAudit })[view]().then(() => { icons(); fx(); }).catch(e => toast(e.message, false));
 }
 
@@ -306,6 +320,178 @@ async function openBug(id) {
   });
 }
 
+// ================================================================== ROLE WORKSPACES
+// Shared helpers ---------------------------------------------------
+async function moveBug(id, status, note, extra = {}) {
+  if (note) await api(`/bugs/${id}/comments`, { method: 'POST', body: { body: note } });
+  await api(`/bugs/${id}/status`, { method: 'POST', body: { status, ...extra } });
+}
+/* Ask for a short text (fix note, failure reason ...) in a small modal. Resolves to the text or null. */
+function askText(title, label, placeholder, required = true) {
+  return new Promise(resolve => {
+    modal(`<h2 class="text-xl font-bold mb-1">${esc(title)}</h2><p class="text-sm text-slate-500 mb-4">${esc(label)}</p>
+      <form id="ask-form"><textarea name="t" rows="4" class="inp" placeholder="${esc(placeholder)}" ${required ? 'required' : ''}></textarea>
+      <div class="flex justify-end gap-2 mt-4"><button type="button" class="btn" id="ask-cancel">Cancel</button><button class="btn-primary">Confirm</button></div></form>`);
+    $('#modal-body').style.maxWidth = '520px';
+    const done = v => { $('#modal-body').style.maxWidth = ''; closeModal(); resolve(v); };
+    $('#ask-cancel').onclick = () => done(null);
+    $('#ask-form').onsubmit = e => { e.preventDefault(); done(e.target.t.value.trim()); };
+    $('#ask-form textarea').focus();
+  });
+}
+const statTile = (label, n, color, icon) => `<div class="card hoverable stat-card px-5 py-4" style="--accent:${color}">
+  <div class="flex items-center justify-between"><p class="text-sm text-slate-400">${label}</p><i data-lucide="${icon}" class="w-4 h-4" style="color:${color}"></i></div>
+  <p class="text-3xl font-bold mt-2" data-count="${n}">0</p></div>`;
+/* A bug card with action buttons. actions: [{label, icon, kind:'primary'|'ok'|'danger'|'', run:async()=>{}}] */
+function workCard(b, actions = [], extra = '') {
+  const id = `wc-${b.id}-${Math.random().toString(36).slice(2, 7)}`;
+  setTimeout(() => {
+    const el = document.getElementById(id); if (!el) return;
+    el.querySelector('[data-open]').onclick = () => openBug(b.id);
+    el.querySelectorAll('[data-act]').forEach((btn, i) => btn.onclick = async () => {
+      btn.disabled = true;
+      try { await actions[i].run(); } catch (ex) { toast(ex.message, false); } finally { btn.disabled = false; }
+    });
+    icons();
+  });
+  const cls = { primary: 'btn-primary', ok: 'btn btn-ok', danger: 'btn btn-danger', '': 'btn' };
+  return `<div class="card work-card p-4" id="${id}">
+    <div class="flex items-start gap-3">
+      <span class="sev-dot sev-dot-${esc(b.severity)} mt-1.5"></span>
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400"><span class="font-mono">#${b.id}</span>${sev(b.severity)}<span class="font-bold">${esc(b.priority)}</span>${st(b.status)}<span>· ${esc(b.component)}</span></div>
+        <p class="font-semibold mt-1.5 leading-snug cursor-pointer hover:underline" data-open>${esc(b.title)}</p>
+        <p class="text-xs text-slate-400 mt-1">${esc(b.project_name)} · reported by ${esc(b.reporter_name)} · ${ago(b.updated_at)}${b.assignee_name ? ` · dev: <b>${esc(b.assignee_name)}</b>` : ''}</p>
+        ${extra}
+      </div>
+    </div>
+    ${actions.length ? `<div class="flex flex-wrap gap-2 mt-3 pl-5">${actions.map(a => `<button data-act class="${cls[a.kind || '']} !py-1.5 !px-3 text-sm"><i data-lucide="${a.icon}" class="w-4 h-4"></i>${esc(a.label)}</button>`).join('')}</div>` : ''}
+  </div>`;
+}
+const section = (title, sub, cards, empty) => `<div class="space-y-3">
+  <div class="flex items-baseline justify-between"><h3 class="font-semibold">${title} <span class="text-slate-400 font-normal text-sm">(${cards.length})</span></h3><span class="text-xs text-slate-500">${sub}</span></div>
+  ${cards.length ? cards.join('') : `<div class="card p-6 text-center text-sm text-slate-400">${empty}</div>`}</div>`;
+const pageHead = (title, sub, right = '') => `<div class="flex flex-wrap items-end justify-between gap-4">
+  <div><h2 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">${title}</h2><p class="text-sm text-slate-400 mt-1">${sub}</p></div>${right}</div>`;
+
+// DEVELOPER: My Work ------------------------------------------------
+async function viewWork() {
+  const bugs = await api('/bugs?mine=1');
+  const by = s => bugs.filter(b => s.includes(b.status));
+  const todo = by(['ASSIGNED', 'REOPENED']), doing = by(['IN_PROGRESS']), qa = by(['FIXED', 'IN_TESTING']), done = by(['VERIFIED', 'CLOSED']);
+  const start = b => ({ label: b.status === 'REOPENED' ? 'Restart work' : 'Start work', icon: 'play', kind: 'primary',
+    run: async () => { await moveBug(b.id, 'IN_PROGRESS'); toast(`#${b.id} is now IN PROGRESS`); route(); } });
+  const fixed = b => ({ label: 'Mark as fixed', icon: 'check', kind: 'ok', run: async () => {
+    const note = await askText(`Mark #${b.id} as fixed`, 'Describe what you changed so the tester knows what to verify.', 'e.g. Added null check in login form validation; added unit test.');
+    if (note === null) return; await moveBug(b.id, 'FIXED', '🔧 Fix note: ' + note); toast(`#${b.id} sent to QA`); route(); } });
+  const comment = b => ({ label: 'Add update', icon: 'message-square', run: async () => {
+    const t = await askText(`Update on #${b.id}`, 'Post a progress update visible to the reporter and the team.', 'e.g. Reproduced the issue, root cause is ...');
+    if (t) { await api(`/bugs/${b.id}/comments`, { method: 'POST', body: { body: t } }); toast('Update posted'); route(); } } });
+  const reopenNote = b => b.status === 'REOPENED' ? `<p class="mt-2 text-xs px-2 py-1 rounded-lg bg-rose-500/10 text-rose-400 inline-block">Reopened by QA – check the latest comment for the failure reason</p>` : '';
+  $('#view').innerHTML = `<div class="space-y-6 max-w-6xl">
+    ${pageHead('My Work', 'Bugs assigned to you. Start working, post updates and send fixes to QA.')}
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      ${statTile('To do', todo.length, '#fbbf24', 'inbox')}${statTile('In progress', doing.length, '#a78bfa', 'loader')}
+      ${statTile('Waiting for QA', qa.length, '#7dd3fc', 'flask-conical')}${statTile('Done', done.length, '#34d399', 'circle-check')}</div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      ${section('To do', 'assigned to you – start one', todo.map(b => workCard(b, [start(b)], reopenNote(b))), 'Nothing new assigned to you 🎉')}
+      ${section('In progress', 'when done, mark as fixed', doing.map(b => workCard(b, [fixed(b), comment(b)])), 'Start a bug from your To-do list')}
+    </div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      ${section('Waiting for QA', 'tester is verifying your fix', qa.map(b => workCard(b)), 'No fixes waiting for testing')}
+      ${section('Done', 'verified / closed', done.slice(0, 6).map(b => workCard(b)), 'No completed bugs yet')}
+    </div></div>`;
+}
+
+// TESTER: QA Queue --------------------------------------------------
+async function viewQA() {
+  const bugs = await api('/bugs?statuses=NEW,FIXED,IN_TESTING,VERIFIED');
+  const by = s => bugs.filter(b => b.status === s);
+  const ready = by('FIXED'), testing = by('IN_TESTING'), verified = by('VERIFIED'), fresh = by('NEW');
+  const startT = b => ({ label: 'Start testing', icon: 'flask-conical', kind: 'primary', run: async () => { await moveBug(b.id, 'IN_TESTING'); toast(`Testing #${b.id}`); route(); } });
+  const pass = b => ({ label: 'Pass – verified', icon: 'check-check', kind: 'ok', run: async () => {
+    const n = await askText(`Verify #${b.id}`, 'Optional: how did you test it?', 'e.g. Tested on Chrome & Edge, login with empty password now shows an error.', false);
+    if (n === null) return; await moveBug(b.id, 'VERIFIED', n ? '✅ Test passed: ' + n : '✅ Test passed'); toast(`#${b.id} verified`); route(); } });
+  const fail = b => ({ label: 'Fail – reopen', icon: 'x', kind: 'danger', run: async () => {
+    const r = await askText(`Reopen #${b.id}`, 'Explain what still fails. The developer will be notified.', 'e.g. Still crashes when the password contains spaces.');
+    if (r === null) return; await moveBug(b.id, 'REOPENED', '❌ Test failed: ' + r); toast(`#${b.id} reopened and sent back`); route(); } });
+  const close = b => ({ label: 'Close bug', icon: 'archive', run: async () => { await moveBug(b.id, 'CLOSED'); toast(`#${b.id} closed`); route(); } });
+  const dup = b => ({ label: 'Mark duplicate', icon: 'copy', run: async () => {
+    const o = await askText(`Mark #${b.id} as duplicate`, 'Enter the ID of the original bug (number only).', 'e.g. 8');
+    if (!o) return; await moveBug(b.id, 'DUPLICATE', `Duplicate of #${o}`, { duplicate_of: parseInt(o) }); toast(`#${b.id} marked duplicate of #${o}`); route(); } });
+  $('#view').innerHTML = `<div class="space-y-6 max-w-6xl">
+    ${pageHead('QA Queue', 'Verify developer fixes, reopen failures, close verified bugs and catch duplicates.',
+      `<button class="btn-primary" onclick="openNewBug()"><i data-lucide="bug" class="w-4 h-4"></i>Report a bug you found</button>`)}
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+      ${statTile('Ready to test', ready.length, '#7dd3fc', 'inbox')}${statTile('Testing now', testing.length, '#a78bfa', 'flask-conical')}
+      ${statTile('Verified', verified.length, '#34d399', 'check-check')}${statTile('New reports', fresh.length, '#fbbf24', 'sparkles')}</div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      ${section('Ready to test', 'developer marked these as fixed', ready.map(b => workCard(b, [startT(b)])), 'No fixes waiting – nice!')}
+      ${section('Testing now', 'pass or fail each one', testing.map(b => workCard(b, [pass(b), fail(b)])), 'Start testing a bug from the left')}
+    </div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      ${section('Verified – ready to close', 'close once the release is confirmed', verified.map(b => workCard(b, [close(b)])), 'Nothing to close')}
+      ${section('New reports – check for duplicates', 'mark duplicates before triage', fresh.map(b => workCard(b, [dup(b)])), 'No new reports')}
+    </div></div>`;
+}
+
+// MANAGER / ADMIN: Triage & Assign ----------------------------------
+async function viewTriage() {
+  const [bugs, dash] = await Promise.all([api('/bugs?statuses=NEW,REOPENED,ASSIGNED'), api('/dashboard')]);
+  state.users = await api('/users');
+  const devs = dash.workload;
+  const queue = bugs.filter(b => b.status !== 'ASSIGNED'), assigned = bugs.filter(b => b.status === 'ASSIGNED');
+  const devOptions = sel => devs.map(d => `<option value="${d.user_id}" ${d.user_id == sel ? 'selected' : ''}>${esc(d.username)} · ${esc(d.skills || '-')} · load ${d.load_score}</option>`).join('');
+  const picker = b => `<div class="mt-3 flex flex-wrap items-center gap-2"><select class="inp !w-auto !py-1.5 text-sm" data-dev="${b.id}">${devOptions(b.assignee_id)}</select></div>`;
+  const assign = b => ({ label: 'Assign selected', icon: 'user-check', kind: 'primary', run: async () => {
+    const v = document.querySelector(`[data-dev="${b.id}"]`).value;
+    const r = await api(`/bugs/${b.id}/assign`, { method: 'POST', body: { assignee_id: +v } }); toast(`#${b.id} → ${r.assignee_name}`); route(); } });
+  const auto = b => ({ label: 'Auto-assign (AI)', icon: 'sparkles', run: async () => {
+    const r = await api(`/bugs/${b.id}/assign`, { method: 'POST', body: { strategy: 'skill_based' } }); toast(`#${b.id} auto-assigned to ${r.assignee_name}`); route(); } });
+  const reject = b => ({ label: 'Reject', icon: 'ban', kind: 'danger', run: async () => {
+    const r = await askText(`Reject #${b.id}`, 'Why is this not a valid bug?', 'e.g. Works as designed / cannot reproduce.');
+    if (r === null) return; await moveBug(b.id, 'REJECTED', '🚫 Rejected: ' + r); toast(`#${b.id} rejected`); route(); } });
+  $('#view').innerHTML = `<div class="space-y-6 max-w-6xl">
+    ${pageHead('Triage & Assign', 'Review incoming bugs, check the AI severity, and assign them to a developer.',
+      queue.length ? `<button class="btn-primary" id="auto-all"><i data-lucide="wand-sparkles" class="w-4 h-4"></i>Auto-assign all (${queue.length})</button>` : '')}
+    <div class="card p-5"><h3 class="font-semibold text-sm mb-3">Team workload <span class="text-slate-400 font-normal">– auto-assign picks the best skill match with the lowest load</span></h3>
+      <div class="grid sm:grid-cols-3 gap-3">${devs.map(d => `<div class="flex items-center gap-3 p-3 rounded-xl bg-slate-500/5 border border-slate-500/10">
+        <div class="avatar !w-9 !h-9 text-xs">${initials(d.username)}</div><div class="flex-1"><p class="text-sm font-semibold">${esc(d.username)}</p>
+        <p class="text-[11px] text-slate-400">${esc(d.skills || '')}</p><div class="mt-1 h-1.5 rounded-full bg-slate-500/15 overflow-hidden"><div class="h-full bar-fill rounded-full bg-indigo-400" style="width:${Math.min(100, d.load_score * 8)}%"></div></div></div>
+        <span class="text-xs text-slate-400">${d.open_bugs} open</span></div>`).join('')}</div></div>
+    ${section('Needs assignment', 'new and reopened bugs', queue.map(b => workCard(b, [assign(b), auto(b), reject(b)],
+      `${b.ai_severity ? `<p class="text-xs text-slate-400 mt-2">AI suggested ${sev(b.ai_severity)} (${Math.round((b.ai_confidence || 0) * 100)}%)</p>` : ''}${picker(b)}`)), 'Inbox zero – every bug is assigned ✅')}
+    ${section('Assigned – not started yet', 'reassign if needed', assigned.map(b => workCard(b, [assign(b)], picker(b))), 'No waiting assignments')}
+  </div>`;
+  const all = $('#auto-all');
+  if (all) all.onclick = async () => { all.disabled = true; let n = 0;
+    for (const b of queue) { try { await api(`/bugs/${b.id}/assign`, { method: 'POST', body: { strategy: 'skill_based' } }); n++; } catch {} }
+    toast(`Auto-assigned ${n} bug(s)`); route(); };
+}
+
+// REPORTER (and tester): My Reports ---------------------------------
+const STEPS = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'FIXED', 'IN_TESTING', 'VERIFIED', 'CLOSED'];
+function tracker(status) {
+  if (['REJECTED', 'DUPLICATE'].includes(status)) return `<p class="mt-3 text-xs text-slate-400">This report was marked <b>${esc(status)}</b>.</p>`;
+  const cur = status === 'REOPENED' ? 2 : STEPS.indexOf(status);
+  return `<div class="tracker mt-3">${STEPS.map((s, i) => `<div class="tstep ${i < cur ? 'done' : i === cur ? 'now' : ''}"><span></span><p>${s.replace('_', ' ').toLowerCase()}</p></div>`).join('')}</div>`;
+}
+async function viewReports() {
+  const bugs = await api('/bugs?reported=1');
+  const open = bugs.filter(b => !['VERIFIED', 'CLOSED', 'REJECTED', 'DUPLICATE'].includes(b.status));
+  const comment = b => ({ label: 'Add info', icon: 'message-square', run: async () => {
+    const t = await askText(`Add information to #${b.id}`, 'Extra details, steps or screenshots links for the developer.', 'e.g. It also happens on mobile.');
+    if (t) { await api(`/bugs/${b.id}/comments`, { method: 'POST', body: { body: t } }); toast('Added'); route(); } } });
+  $('#view').innerHTML = `<div class="space-y-6 max-w-5xl">
+    ${pageHead('My Reports', 'Bugs you reported and where they are in the fixing process.',
+      `<button class="btn-primary" onclick="openNewBug()"><i data-lucide="plus" class="w-4 h-4"></i>Report a new bug</button>`)}
+    <div class="grid sm:grid-cols-3 gap-4 stagger">${statTile('Reported by you', bugs.length, '#f9a8d4', 'file-text')}
+      ${statTile('Still open', open.length, '#fbbf24', 'loader')}${statTile('Fixed & verified', bugs.filter(b => ['VERIFIED', 'CLOSED'].includes(b.status)).length, '#34d399', 'circle-check')}</div>
+    ${section('Your reports', 'click a title to see comments & history', bugs.map(b => workCard(b, [comment(b)], tracker(b.status))),
+      'You have not reported any bugs yet – click “Report a new bug”.')}
+  </div>`;
+}
+
 // ------------------------------------------------------------------ releases
 async function viewReleases() {
   state.projects = await api('/projects');
@@ -348,7 +534,13 @@ async function viewTeam() {
    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger">${state.users.map(u => `<div class="card hoverable glow-card p-5 flex items-center gap-4">
      <div class="avatar !w-12 !h-12">${initials(u.username)}</div><div class="min-w-0"><p class="font-bold truncate">${esc(u.username)}</p>
      <p class="text-xs text-slate-400 truncate">${esc(u.email)}</p><span class="badge st mt-1">${esc(u.role)}</span>
-     ${u.skills ? `<p class="text-xs mt-1 text-slate-500">${esc(u.skills)}</p>` : ''}</div></div>`).join('')}</div></div>`;
+     ${u.skills ? `<p class="text-xs mt-1 text-slate-500">${esc(u.skills)}</p>` : ''}
+     ${admin && u.id !== state.user.id ? `<div class="flex gap-2 mt-2"><select class="inp !py-1 !px-2 text-xs !w-auto" data-role="${u.id}">
+        ${['REPORTER','DEVELOPER','TESTER','MANAGER','ADMIN'].map(r => `<option ${r === u.role ? 'selected' : ''}>${r}</option>`).join('')}</select>
+        <button class="btn !py-1 !px-2 text-xs" data-save="${u.id}">Save role</button></div>` : ''}</div></div>`).join('')}</div></div>`;
+  $$('[data-save]').forEach(b => b.onclick = async () => {
+    const role = $(`[data-role="${b.dataset.save}"]`).value;
+    try { await api(`/users/${b.dataset.save}`, { method: 'PATCH', body: { role } }); toast('Role updated to ' + role); route(); } catch (ex) { toast(ex.message, false); } });
   const f = $('#u-form');
   if (f) f.onsubmit = async e => { e.preventDefault(); try { await api('/users', { method: 'POST', body: Object.fromEntries(new FormData(f)) }); toast('Member added'); route(); } catch (ex) { toast(ex.message, false); } };
 }

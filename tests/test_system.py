@@ -95,3 +95,20 @@ def test_st13_notifications_flow(client, login):
     assert n and any("assigned to you" in x["message"] for x in n)
     client.post("/api/notifications/read", headers=h)
     assert all(x["is_read"] for x in client.get("/api/notifications", headers=h).json)
+
+
+def test_st14_role_workspace_filters(client, login):
+    rep = login("reporter")
+    mine = client.get("/api/bugs?reported=1", headers=rep).json
+    assert mine and all(b["reporter_name"] == "reporter" for b in mine)
+    qa = client.get("/api/bugs?statuses=FIXED,IN_TESTING,NEW", headers=login("tester")).json
+    assert qa and all(b["status"] in ("FIXED", "IN_TESTING", "NEW") for b in qa)
+
+
+def test_st15_admin_changes_role_others_cannot(client, login):
+    rep_id = client.post("/api/auth/register", json={"username": "newbie", "email": "nb@x.io",
+                                                     "password": "GoodPass1"}).json["id"]
+    assert client.patch(f"/api/users/{rep_id}", headers=login("manager"), json={"role": "ADMIN"}).status_code == 403
+    r = client.patch(f"/api/users/{rep_id}", headers=login("admin"), json={"role": "DEVELOPER", "skills": "ui"})
+    assert r.status_code == 200 and r.json["role"] == "DEVELOPER"
+    assert client.patch(f"/api/users/{rep_id}", headers=login("admin"), json={"role": "KING"}).status_code == 400

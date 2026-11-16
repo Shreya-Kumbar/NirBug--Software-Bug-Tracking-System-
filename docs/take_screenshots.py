@@ -7,33 +7,60 @@
 import base64
 import json
 import os
+import socket
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
 
 import websocket  # pip install websocket-client
 
-URL = "http://127.0.0.1:5000"
+URL = os.environ.get("NIRBUG_URL", "http://127.0.0.1:5000")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 W, H = 1440, 900
 os.makedirs(OUT, exist_ok=True)
 
 
+# Local requests must never go through a system/college proxy
+DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
+def free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def check_app_running():
+    try:
+        DIRECT.open(URL + "/api/health", timeout=5)
+    except Exception:
+        sys.exit(f"NirBug is not running at {URL}.\nStart it first in another terminal:  python -m bugtracker.app")
+
+
 class Browser:
     def __init__(self):
-        self.proc = subprocess.Popen([EDGE, "--headless=new", "--remote-debugging-port=9333", f"--window-size={W},{H}",
-                                      "--hide-scrollbars", f"--user-data-dir={tempfile.mkdtemp()}", "about:blank"],
+        if not os.path.exists(EDGE):
+            sys.exit(f"Microsoft Edge not found at {EDGE}")
+        port = free_port()   # a fresh free port every run (avoids clashes with an old Edge)
+        self.proc = subprocess.Popen([EDGE, "--headless=new", f"--remote-debugging-port={port}", f"--window-size={W},{H}",
+                                      "--hide-scrollbars", "--no-first-run", "--no-default-browser-check", "--proxy-bypass-list=127.0.0.1;localhost;<-loopback>",
+                                      f"--user-data-dir={tempfile.mkdtemp()}", "about:blank"],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        for _ in range(50):
+        ws = None
+        for _ in range(150):   # wait up to ~30 s for Edge to start
             try:
-                tabs = json.load(urllib.request.urlopen("http://127.0.0.1:9333/json"))
+                tabs = json.load(DIRECT.open(f"http://127.0.0.1:{port}/json", timeout=2))
                 ws = next(t["webSocketDebuggerUrl"] for t in tabs if t["type"] == "page")
                 break
             except Exception:
                 time.sleep(0.2)
-        self.ws = websocket.create_connection(ws, suppress_origin=True)
+        if not ws:
+            self.proc.kill()
+            sys.exit("Headless Edge did not start in 30 s. Close any stuck 'msedge' processes in Task Manager and try again.")
+        self.ws = websocket.create_connection(ws, suppress_origin=True, http_no_proxy=["127.0.0.1", "localhost"])
         self.i = 0
         self.cmd("Emulation.setDeviceMetricsOverride", width=W, height=H, deviceScaleFactor=1.5, mobile=False)
 
@@ -52,8 +79,21 @@ class Browser:
         self.cmd("Page.navigate", url=url)
         time.sleep(wait)
 
+    def styled(self) -> bool:
+        """True when Tailwind, Chart.js and the icons (loaded from CDNs) are all available."""
+        r = self.js("!!(window.tailwind && window.Chart && window.lucide)")
+        return bool(r.get("result", {}).get("value"))
+
     def shot(self, name, wait=1.5):
         time.sleep(wait)
+        for _ in range(20):
+            if self.styled():
+                break
+            time.sleep(0.5)
+        else:
+            self.close()
+            sys.exit("The page loaded WITHOUT its styles (Tailwind / Chart.js / icons come from the internet).\n"
+                     "Check your internet connection, then run the script again. No broken screenshot was saved.")
         data = self.cmd("Page.captureScreenshot", format="png")["data"]
         with open(os.path.join(OUT, name), "wb") as f:
             f.write(base64.b64decode(data))
@@ -65,6 +105,7 @@ class Browser:
 
 
 def main():
+    check_app_running()
     b = Browser()
     b.go(URL)
     b.js("localStorage.setItem('theme','dark'); sessionStorage.clear(); location.reload()")
@@ -97,6 +138,15 @@ def main():
     b.js("localStorage.setItem('theme','light'); location.hash='dashboard'; location.reload()")
     b.shot("08_dashboard_light.png", 4)
     b.js("localStorage.setItem('theme','dark')")
+
+    # role workspaces: (user, page, file)
+    for user, page, name in [("dev_alice", "work", "09_developer_my_work.png"), ("tester", "qa", "10_tester_qa_queue.png"),
+                             ("manager", "triage", "11_manager_triage.png"), ("reporter", "reports", "12_reporter_my_reports.png"),
+                             ("admin", "team", "13_admin_users_roles.png")]:
+        b.js(f"""fetch('/api/auth/login',{{method:'POST',headers:{{'Content-Type':'application/json'}},
+                body:JSON.stringify({{username:'{user}',password:'Demo@1234'}})}}).then(r=>r.json())
+                .then(r=>{{sessionStorage.setItem('token',r.token); location.hash='{page}'; location.reload();}})""")
+        b.shot(name, 4)
     b.close()
 
 

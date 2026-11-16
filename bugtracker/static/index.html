@@ -69,14 +69,7 @@
   <div class="app-aurora"><span></span><span></span><span></span></div>
   <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 -translate-x-full lg:translate-x-0 transition bg-slate-900 text-slate-300 flex flex-col">
     <div class="h-16 flex items-center gap-2 px-6 text-white text-xl font-extrabold"><i data-lucide="bug" class="text-brand-400"></i>NirBug</div>
-    <nav class="flex-1 px-3 space-y-1" id="nav">
-      <a data-view="dashboard" class="nav-link"><i data-lucide="layout-dashboard"></i>Dashboard</a>
-      <a data-view="bugs" class="nav-link"><i data-lucide="list-checks"></i>All Bugs</a>
-      <a data-view="board" class="nav-link"><i data-lucide="kanban"></i>Board</a>
-      <a data-view="mine" class="nav-link"><i data-lucide="user-check"></i>My Work</a>
-      <a data-view="releases" class="nav-link"><i data-lucide="rocket"></i>Releases</a>
-      <a data-view="team" class="nav-link" data-perm="assign"><i data-lucide="users"></i>Team</a>
-      <a data-view="audit" class="nav-link" data-perm="audit"><i data-lucide="scroll-text"></i>Audit Log</a>
+    <nav class="flex-1 px-3 space-y-1" id="nav"><!-- filled per role by app.js (buildNav) -->
     </nav>
     <div class="p-4 border-t border-slate-800">
       <div class="flex items-center gap-3">

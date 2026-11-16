@@ -396,3 +396,26 @@ select.inp { appearance:none; -webkit-appearance:none; padding-right:2.25rem; cu
 html:not(.dark) #ai-box { background:linear-gradient(150deg,#f5f3ff,#fdf2f8) !important; }
 select.inp { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
   background-repeat:no-repeat !important; background-position:right .8rem center !important; background-size:16px !important; }
+
+/* ===================================================================
+   ROLE WORKSPACES - action buttons, work cards, progress tracker
+   =================================================================== */
+.btn-ok { background:rgba(16,185,129,.14) !important; border-color:rgba(16,185,129,.35) !important; color:#059669 !important; }
+.btn-ok:hover { background:#10b981 !important; color:#fff !important; }
+.btn-danger { background:rgba(244,63,94,.1) !important; border-color:rgba(244,63,94,.3) !important; color:#e11d48 !important; }
+.btn-danger:hover { background:#f43f5e !important; color:#fff !important; }
+.dark .btn-ok { color:#6ee7b7 !important; } .dark .btn-danger { color:#fda4af !important; }
+button:disabled { opacity:.5; cursor:wait; }
+.work-card { transition:border-color .2s, transform .2s; }
+.work-card:hover { border-color:rgba(167,139,250,.4) !important; }
+html:not(.dark) .work-card { background:linear-gradient(135deg,#ffffff 0%,#faf7ff 60%,#fdf4f9 100%); }
+/* reporter's progress tracker */
+.tracker { display:flex; gap:0; }
+.tstep { flex:1; position:relative; text-align:center; }
+.tstep span { display:block; width:12px; height:12px; margin:0 auto; border-radius:50%; background:rgba(148,163,184,.3); position:relative; z-index:1; }
+.tstep::before { content:""; position:absolute; top:5px; left:-50%; width:100%; height:2px; background:rgba(148,163,184,.25); }
+.tstep:first-child::before { display:none; }
+.tstep.done span, .tstep.done::before, .tstep.now::before { background:#a78bfa; }
+.tstep.now span { background:#7c3aed; box-shadow:0 0 0 4px rgba(124,58,237,.22); }
+.tstep p { font-size:10px; margin-top:4px; color:#94a3b8; text-transform:capitalize; }
+.tstep.now p { color:#7c3aed; font-weight:700; } .dark .tstep.now p { color:#c4b5fd; }

@@ -213,13 +213,18 @@ class BugRepository(Repository):
               LEFT JOIN users a ON a.id = b.assignee_id
               LEFT JOIN releases rl ON rl.id = b.target_release_id"""
 
-    def search(self, status=None, severity=None, project_id=None, assignee_id=None, q=None) -> list[dict]:
+    def search(self, status=None, severity=None, project_id=None, assignee_id=None, q=None,
+               reporter_id=None, statuses=None) -> list[dict]:
         where, params = [], []
         for col, val in (("b.status", status), ("b.severity", severity),
-                         ("b.project_id", project_id), ("b.assignee_id", assignee_id)):
+                         ("b.project_id", project_id), ("b.assignee_id", assignee_id),
+                         ("b.reporter_id", reporter_id)):
             if val not in (None, ""):
                 where.append(f"{col} = ?")
                 params.append(val)
+        if statuses:  # several statuses at once, e.g. the tester's queue (FIXED, IN_TESTING)
+            where.append("b.status IN (%s)" % ",".join("?" * len(statuses)))
+            params += list(statuses)
         if q:
             where.append("(b.title LIKE ? OR b.description LIKE ?)")
             params += [f"%{q}%", f"%{q}%"]

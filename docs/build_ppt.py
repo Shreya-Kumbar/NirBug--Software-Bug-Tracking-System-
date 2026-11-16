@@ -1,4 +1,4 @@
-"""Builds the presentation  ->  docs/NirBug_Presentation.pptx   (16:9, 20 slides)"""
+"""Builds the presentation  ->  docs/NirBug_Presentation.pptx   (16:9, 22 slides)"""
 import os
 
 from pptx import Presentation
@@ -113,7 +113,7 @@ image(s, os.path.join(DIA, "12_sdlc.png"), y=1.35, h=5.7)
 s = slide("SDLC Phases & Why This Model", 4)
 phases = [("1. Plan & Requirements", "Problem, scope, SRS, schedule"), ("2. Analysis", "Stakeholders, use cases, feasibility"),
           ("3. Design", "Architecture, UML, ER diagram, patterns"), ("4. Implementation", "Flask back-end, DB, AI, web UI"),
-          ("5. Testing", "63 unit / integration / system tests"), ("6. Review & Deploy", "Demo each sprint, plan the next"),
+          ("5. Testing", "65 unit / integration / system tests"), ("6. Review & Deploy", "Demo each sprint, plan the next"),
           ("7. Maintenance", "Fix, adapt, extend after delivery")]
 for i, (h, d) in enumerate(phases):
     x, y = Inches(0.5 + (i % 4) * 3.15), Inches(1.45 + (i // 4) * 1.55)
@@ -126,13 +126,13 @@ bullets(s, ["Why Iterative Incremental:|16-day deadline, 2-person team, changing
 
 # 5 SRS
 s = slide("Requirements (SRS – IEEE 830)", 5)
-text(s, Inches(0.6), Inches(1.4), Inches(6), Inches(0.5), "Functional (16)", 22, True, INDIGO)
+text(s, Inches(0.6), Inches(1.4), Inches(6), Inches(0.5), "Functional (18)", 22, True, INDIGO)
 bullets(s, ["Register / login, 5 roles (RBAC)", "Report bug + AI severity", "Priority derivation", "Duplicate detection",
             "Manual / auto assignment", "Enforced life cycle", "Comments, history, notifications", "Releases + ship gate",
             "Search, dashboard, Kanban, audit log"], x=0.6, y=2.0, w=6, size=16)
 text(s, Inches(7), Inches(1.4), Inches(6), Inches(0.5), "Non-functional (10)", 22, True, INDIGO)
 bullets(s, ["Security: PBKDF2, lockout, rate limit, CSP", "Performance: < 300 ms, DB indexes", "Usability: responsive, dark mode",
-            "Reliability: FK / CHECK constraints", "Maintainability: layers, patterns, 63 tests", "Portability: any OS, Python 3.10+",
+            "Reliability: FK / CHECK constraints", "Maintainability: layers, patterns, 65 tests", "Portability: any OS, Python 3.10+",
             "Accountability: audit log"], x=7, y=2.0, w=6, size=16)
 
 # 6-10 diagrams
@@ -163,9 +163,23 @@ bullets(s, ["Severity classifier:|TF-IDF (word + char n-grams) → Logistic Regr
             "Human-in-the-loop:|user can override; AI/human agreement shown on dashboard",
             "Evaluation:|stratified 5-fold cross-validation, beats random baseline; improves as data grows"], size=18)
 
-# Screens (two slides, 4 screenshots each)
-for title, shots in [("Implementation – Screens (1/2)", ["01_login.png", "02_dashboard.png", "03_bug_list.png", "04_board.png"]),
-                     ("Implementation – Screens (2/2)", ["05_report_bug_ai.png", "06_bug_detail.png", "07_releases.png", "08_dashboard_light.png"])]:
+# Role-based workspaces
+s = slide("Role-based Workspaces – each role has its own job", 0)
+roles = [("Reporter → My Reports", "Track own bugs with a progress bar, add info, report new bugs"),
+         ("Developer → My Work", "Start work · Mark as fixed (fix note) · Post updates · See reopened bugs"),
+         ("Tester → QA Queue", "Start testing · Pass / Fail with reason · Close · Mark duplicate"),
+         ("Manager → Triage & Assign", "Assign or AI auto-assign · Bulk auto-assign · Reject · Releases · Audit"),
+         ("Admin → Users & Roles", "Everything a manager does + create users and change roles")]
+for i, (h, d) in enumerate(roles):
+    y = Inches(1.45 + i * 1.08)
+    rect(s, Inches(0.6), y, Inches(12.1), Inches(0.92), LIGHT, MSO_SHAPE.ROUNDED_RECTANGLE)
+    text(s, Inches(0.85), y + Inches(0.2), Inches(4.2), Inches(0.6), h, 18, True, INDIGO)
+    text(s, Inches(5.1), y + Inches(0.24), Inches(7.4), Inches(0.6), d, 15)
+
+# Screens (three slides, 4 screenshots each)
+for title, shots in [("Implementation – Screens (1/3)", ["01_login.jpg", "02_dashboard.jpg", "03_bug_list.jpg", "04_board.jpg"]),
+                     ("Implementation – Screens (2/3)", ["05_report_bug_ai.jpg", "06_bug_detail.jpg", "07_releases.jpg", "08_dashboard_light.jpg"]),
+                     ("Role Workspaces – Screens (3/3)", ["09_developer_my_work.jpg", "10_tester_qa_queue.jpg", "11_manager_triage.jpg", "12_reporter_my_reports.jpg"])]:
     s = slide(title, 0)
     for i, f in enumerate(shots):
         p = os.path.join(SHOT, f)
@@ -177,7 +191,7 @@ s = slide("Security & Testing", 14)
 text(s, Inches(0.6), Inches(1.4), Inches(6), Inches(0.5), "Security (STRIDE)", 22, True, INDIGO)
 bullets(s, ["PBKDF2-SHA256 salted hashes", "HMAC-signed expiring tokens", "RBAC on every endpoint", "Lockout after 5 failures",
             "Rate limiting (429)", "SQLi: parameterised queries", "XSS: escaping + CSP", "Audit log with IP"], x=0.6, y=2.0, w=6, size=16)
-text(s, Inches(7), Inches(1.4), Inches(6), Inches(0.5), "Testing – 63 tests, all pass", 22, True, INDIGO)
+text(s, Inches(7), Inches(1.4), Inches(6), Inches(0.5), "Testing – 65 tests, all pass", 22, True, INDIGO)
 bullets(s, ["Unit:|state machine, rules, security, AI", "Integration:|services + SQLite",
             "System:|black-box REST API, end-to-end", "Techniques:|BVA, equivalence classes, state-transition, security",
             "Traceability matrix FR → test"], x=7, y=2.0, w=6, size=16)

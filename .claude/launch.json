@@ -1,6 +1,8 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "nirbug", "runtimeExecutable": "python", "runtimeArgs": ["-m", "bugtracker.app"], "port": 5000 }
+    { "name": "nirbug", "runtimeExecutable": "python", "runtimeArgs": ["-m", "bugtracker.app"], "port": 5000 },
+    { "name": "nirbug-test", "runtimeExecutable": "python", "runtimeArgs": ["-m", "bugtracker.app"], "port": 5055,
+      "env": { "NIRBUG_DB": "C:\\Users\\Shreya\\AppData\\Local\\Temp\\claude\\71819e51dacf7e37\\3fabe95d-e87c-49c7-b1fc-940a16ff733f\\scratchpad\\test.db", "PORT": "5055" } }
   ]
 }

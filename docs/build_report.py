@@ -174,7 +174,7 @@ T(["Phase", "What happens", "Output / artefact in this project"],
    ["4. Implementation (Coding)", "Write the code module by module following the design",
     "Flask back-end, SQLite DB, AI module, web front-end (Sections 8–10)"],
    ["5. Testing", "Verify each part and the whole system against the requirements",
-    "63 automated unit, integration and system tests, traceability matrix (Sections 11–12)"],
+    "65 automated unit, integration and system tests, traceability matrix (Sections 11–12)"],
    ["6. Deployment & Review", "Run the increment, demo it, collect feedback, plan the next sprint",
     "Working increment at the end of each sprint, final demo on 15 Nov"],
    ["7. Maintenance", "Fix, adapt and improve the system after delivery",
@@ -188,7 +188,7 @@ T(["Sprint", "Dates", "Increment delivered", "Phases covered"],
    ["Sprint 3", "10 – 15 Nov 2026", "Web UI, releases, dashboard, notifications, audit log, report & PPT",
     "Implementation, system testing, review, deployment/demo"]], [2.2, 3.6, 6.6, 4.6])
 P("Scrum practices we followed (scaled down for a two-person team): a product backlog (the list of functional "
-  "requirements FR-01 to FR-16), sprint planning at the start of each sprint, short daily check-ins between the "
+  "requirements FR-01 to FR-18), sprint planning at the start of each sprint, short daily check-ins between the "
   "two members, and a sprint review/demo at the end of each sprint where the increment was tested and the next "
   "sprint was planned.")
 H("2.4 Why This Model? (Comparison with Other SDLC Models)", 2)
@@ -233,7 +233,9 @@ T(["ID", "Requirement", "Priority"],
    ["FR-13", "Users shall search and filter bugs by text, project, status and severity.", "Medium"],
    ["FR-14", "The system shall show a dashboard (counts by status/severity, workload, mean time to close, AI agreement).", "Medium"],
    ["FR-15", "The system shall record security-relevant actions in an audit log viewable by managers/admins.", "High"],
-   ["FR-16", "A Kanban board shall allow changing bug status by drag-and-drop.", "Low"]], [1.8, 12.5, 2])
+   ["FR-16", "A Kanban board shall allow changing bug status by drag-and-drop.", "Low"],
+   ["FR-17", "Each role shall get its own workspace with its actions: Developer – My Work (start, mark fixed with a fix note, post updates); Tester – QA Queue (start testing, pass, fail with reason, close, mark duplicate); Manager – Triage & Assign (assign, auto-assign, bulk auto-assign, reject); Reporter – My Reports (progress tracker, add information).", "High"],
+   ["FR-18", "The Admin shall be able to change any user's role and skills.", "Medium"]], [1.8, 12.5, 2])
 H("3.3 Non-Functional Requirements", 2)
 T(["ID", "Category", "Requirement"],
   [["NFR-01", "Security", "Passwords hashed with PBKDF2-SHA256 (600 000 iterations, salted); never stored in plain text."],
@@ -401,15 +403,30 @@ H("8.4 Key Algorithm – Skill-based Auto-assignment", 2)
 P("For every developer d:  score(d) = 10 × [bug.component ∈ d.skills] − load(d),  where load(d) = Σ severity weight "
   "(CRITICAL 4, HIGH 3, MEDIUM 2, LOW 1) of d's open bugs. The developer with the highest score is chosen. This "
   "balances expertise and workload. Complexity: O(n) in the number of developers.")
-H("8.5 Screenshots of the System", 2)
-for f, c in [("01_login.png", "Login screen (animated background, demo accounts)"),
-             ("02_dashboard.png", "Dashboard – statistics, severity & status charts, workload, recent bugs (dark theme)"),
-             ("08_dashboard_light.png", "Dashboard in the light theme"),
-             ("03_bug_list.png", "All Bugs – searchable, filterable list with severity, priority and status"),
-             ("04_board.png", "Kanban board – drag a card to change its status (life-cycle rules enforced)"),
-             ("05_report_bug_ai.png", "Report a bug – live AI triage: predicted severity, component and possible duplicate"),
-             ("06_bug_detail.png", "Bug detail – comments, history, assignment and allowed status transitions"),
-             ("07_releases.png", "Releases – readiness percentage and blockers per version")]:
+H("8.5 Role-based Workspaces", 2)
+P("Every role sees a different menu and lands on its own home page after login, containing exactly the actions that role "
+  "is allowed to perform (the same rules are enforced again on the server by RBAC and the state machine). Pages a role "
+  "may not use are not shown, and typing their address redirects the user to their own home page.")
+T(["Role", "Home page", "What they can do there"],
+  [["Reporter", "My Reports", "See only the bugs they reported with a progress tracker (New → … → Closed); add extra information; report new bugs"],
+   ["Developer", "My Work", "To do / In progress / Waiting for QA / Done lists; Start work; Mark as fixed (with a fix note for the tester); post progress updates; see bugs reopened by QA"],
+   ["Tester", "QA Queue", "Start testing fixed bugs; Pass (verify) or Fail (reopen with a reason); Close verified bugs; mark new reports as duplicates; report bugs"],
+   ["Manager", "Dashboard + Triage & Assign", "Team workload; assign each new/reopened bug to a chosen developer or auto-assign (skill + workload); bulk auto-assign; reject invalid reports; reassign; manage releases; audit log"],
+   ["Admin", "Dashboard + Users & Roles", "Everything a manager can do, plus create users and change any user's role and skills"]], [2.4, 3.6, 11])
+H("8.6 Screenshots of the System", 2)
+for f, c in [("01_login.jpg", "Login screen (animated background, demo accounts)"),
+             ("02_dashboard.jpg", "Dashboard – statistics, severity & status charts, workload, recent bugs (dark theme)"),
+             ("08_dashboard_light.jpg", "Dashboard in the light theme"),
+             ("03_bug_list.jpg", "All Bugs – searchable, filterable list with severity, priority and status"),
+             ("04_board.jpg", "Kanban board – drag a card to change its status (life-cycle rules enforced)"),
+             ("05_report_bug_ai.jpg", "Report a bug – live AI triage: predicted severity, component and possible duplicate"),
+             ("06_bug_detail.jpg", "Bug detail – comments, history, assignment and allowed status transitions"),
+             ("07_releases.jpg", "Releases – readiness percentage and blockers per version"),
+             ("09_developer_my_work.jpg", "Developer – My Work: start work, mark as fixed, post updates"),
+             ("10_tester_qa_queue.jpg", "Tester – QA Queue: start testing, pass / fail, close, mark duplicate"),
+             ("11_manager_triage.jpg", "Manager – Triage & Assign: team workload, assign / auto-assign / reject"),
+             ("12_reporter_my_reports.jpg", "Reporter – My Reports with progress tracker"),
+             ("13_admin_users_roles.jpg", "Admin – Users & Roles: add members and change roles")]:
     IMG(os.path.join(SHOT, f), "Screenshot – " + c, 15.5)
 BREAK()
 
@@ -464,13 +481,13 @@ BREAK()
 H("11. Software Testing")
 H("11.1 Test Strategy", 2)
 P("We followed the testing pyramid: many fast unit tests, fewer integration tests and a set of black-box "
-  "system tests through the HTTP API. All 63 automated tests are written with pytest and run with one command "
+  "system tests through the HTTP API. All 65 automated tests are written with pytest and run with one command "
   "(python -m pytest). Techniques used: equivalence partitioning, boundary value analysis (priority rules, "
   "password length), state-transition testing (life cycle), negative / security testing.")
 T(["Level", "File", "Count", "What is tested"],
   [["Unit", "tests/test_unit.py", "35", "State machine, priority rule, RBAC, hashing, tokens, rate limiter, strategies, AI"],
    ["Integration", "tests/test_integration.py", "15", "Services + repositories + SQLite: workflow, history, observer, lockout"],
-   ["System", "tests/test_system.py", "13", "Full HTTP API: auth, end-to-end life cycle, RBAC, XSS/SQLi, headers, releases"]],
+   ["System", "tests/test_system.py", "15", "Full HTTP API: auth, end-to-end life cycle, RBAC, XSS/SQLi, headers, releases"]],
   [2.5, 4.5, 1.5, 8.5])
 H("11.2 Selected Test Cases", 2)
 T(["ID", "Description", "Input", "Expected", "Result"],
@@ -492,7 +509,7 @@ T(["ID", "Description", "Input", "Expected", "Result"],
    ["ST-11", "Release gate", "Ship with open CRITICAL", "409, then 200 after resolution", "Pass"]],
   [1.5, 4, 4, 5, 1.5])
 H("11.3 Test Results", 2)
-P("63 passed, 0 failed (python -m pytest -q). Manual exploratory testing of the UI was also performed on Chrome "
+P("65 passed, 0 failed (python -m pytest -q). Manual exploratory testing of the UI was also performed on Chrome "
   "and Edge in light and dark mode at desktop and mobile widths.")
 BREAK()
 
@@ -512,7 +529,9 @@ T(["Requirement", "Design element", "Test case(s)"],
    ["FR-06 Duplicates", "find_duplicates", "UT-22, ST-07"], ["FR-07 Assignment", "AssignmentStrategy", "UT-15..18, IT-03/04"],
    ["FR-08 Life cycle", "BugStateMachine", "UT-01..06, IT-05/07, ST-05"], ["FR-09 Own bugs only", "BugService.change_status", "IT-06"],
    ["FR-11 Notifications", "NotificationListener", "IT-08, ST-13"], ["FR-12 Releases", "release_readiness, ship", "IT-10, ST-11"],
-   ["FR-13 Search", "BugRepository.search", "ST-12, IT-15"], ["FR-15 Audit", "AuditListener", "IT-08"]], [5, 6, 6])
+   ["FR-13 Search", "BugRepository.search", "ST-12, IT-15"], ["FR-15 Audit", "AuditListener", "IT-08"],
+   ["FR-17 Role workspaces", "NAV per role, viewWork/viewQA/viewTriage/viewReports, bug filters", "ST-14"],
+   ["FR-18 Role management", "PATCH /api/users/{id} (admin only)", "ST-15"]], [5, 6, 6])
 H("12.2 Quality Practices", 2)
 B(["Coding standard: PEP 8, type hints, docstrings in every module.",
    "Version control with Git; feature branches and pull-request review between the two members.",
@@ -576,7 +595,7 @@ P("NirBug meets all the required features – bug reporting, severity classifica
   "tracking, testing status and release management – and adds AI-assisted triage, a Kanban board and analytics. "
   "More importantly, it was produced with a systematic SDLC: requirements were specified and traced, the system was "
   "modelled with UML, designed with a layered architecture and design patterns, implemented with OOP, secured "
-  "with defence-in-depth, verified with 63 automated tests, and planned with milestones, a Gantt chart and risk "
+  "with defence-in-depth, verified with 65 automated tests, and planned with milestones, a Gantt chart and risk "
   "analysis.")
 P("Future scope: e-mail/Slack integration, Git and CI/CD integration (auto-close bugs from commit messages), "
   "attachments and screenshots, SLA timers, transformer-based NLP models, and multi-tenant cloud deployment.")
